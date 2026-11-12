@@ -30,19 +30,19 @@
     "HTML5"
   ],
   "dependencies": {
-    "event-emitter": "^0.3.5"
+    "event-emitter": "^0.3.7"
   },
   "devDependencies": {
-    "@rsbuild/plugin-sass": "^1.4.0",
-    "@rslib/core": "^0.16.1",
-    "css-loader": "^7.1.2",
-    "cz-conventional-changelog": "^2.1.0",
-    "eslint": "^7.32.0",
-    "sass": "^1.54.0",
-    "sass-loader": "^16.0.5",
-    "serve": "^14.2.1",
+    "@rsbuild/plugin-sass": "^2.0.1",
+    "@rslib/core": "^1.0.6",
+    "css-loader": "^7.1.5",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^10.14.0",
+    "sass": "^1.108.2",
+    "sass-loader": "^17.1.0",
+    "serve": "^14.2.7",
     "style-loader": "^4.0.0",
-    "yargs": "^17.5.1"
+    "yargs": "^18.2.0"
   },
   "repository": {
     "type": "git",
