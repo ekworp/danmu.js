@@ -85,6 +85,9 @@ export class DanmuJs extends BaseClass {
     addClass(this.container, 'danmu')
     this.live = config.live
     this.player = config.player
+    this._playerWaiting = false
+    this._playerEvents = []
+    this._bindPlayerEvents()
     this.direction = config.direction
     this.bulletBtn = new Control(this)
     this.main = this.bulletBtn.main
@@ -128,6 +131,50 @@ export class DanmuJs extends BaseClass {
     }
   }
 
+  _bindPlayerEvents() {
+    const { player } = this
+
+    if (!player || typeof player.addEventListener !== 'function') {
+      return
+    }
+
+    const onWaiting = () => {
+      if (this.status === 'playing') {
+        this.pause()
+        this._playerWaiting = true
+      }
+    }
+    const onPlaying = () => {
+      if (this._playerWaiting) {
+        this._playerWaiting = false
+        this.play()
+      }
+    }
+    const onPause = () => {
+      this._playerWaiting = false
+    }
+
+    this._playerEvents = [
+      ['waiting', onWaiting],
+      ['playing', onPlaying],
+      ['pause', onPause]
+    ]
+    this._playerEvents.forEach(([event, handler]) => {
+      player.addEventListener(event, handler)
+    })
+  }
+
+  _unbindPlayerEvents() {
+    if (!this.player || typeof this.player.removeEventListener !== 'function') {
+      return
+    }
+
+    this._playerEvents.forEach(([event, handler]) => {
+      this.player.removeEventListener(event, handler)
+    })
+    this._playerEvents = []
+  }
+
   start() {
     this.logger && this.logger.info('start')
     this.main && this.main.start()
@@ -135,6 +182,7 @@ export class DanmuJs extends BaseClass {
 
   pause() {
     this.logger && this.logger.info('pause')
+    this._playerWaiting = false
     this.main && this.main.pause()
   }
 
@@ -156,6 +204,7 @@ export class DanmuJs extends BaseClass {
   destroy() {
     unObserver(this.container)
     this.logger && this.logger.info('destroy')
+    this._unbindPlayerEvents()
     this.stop()
     this.bulletBtn && this.bulletBtn.destroy()
     this.recycler && this.recycler.destroy()
