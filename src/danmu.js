@@ -39,7 +39,8 @@ export class DanmuJs extends BaseClass {
       bulletOffset: undefined,
       interval: 2000,
       highScorePriority: true, // 高积分优先展示
-      chaseEffect: true // 滚动弹幕追逐效果
+      chaseEffect: true, // 滚动弹幕追逐效果
+      responsiveFontSize: false // 根据容器主方向尺寸连续缩放普通弹幕字体
     })
     deepCopy(config, options)
 
@@ -89,6 +90,7 @@ export class DanmuJs extends BaseClass {
     this._playerEvents = []
     this._bindPlayerEvents()
     this.direction = config.direction
+    this._responsiveFontSizeBase = this._getResponsiveSize()
     this.bulletBtn = new Control(this)
     this.main = this.bulletBtn.main
     this.isReady = true
@@ -131,6 +133,65 @@ export class DanmuJs extends BaseClass {
     }
   }
 
+  _getResponsiveSize() {
+    if (!this.container) return 0
+
+    const rect = this.container.getBoundingClientRect()
+    return this.direction === 'b2t' ? rect.height : rect.width
+  }
+
+  _getResponsiveFontSize(item, el) {
+    if (item.responsiveFontSize_) {
+      return item.responsiveFontSize_
+    }
+
+    let fontSize = item.style && item.style.fontSize
+    if (!fontSize && el && typeof getComputedStyle === 'function') {
+      fontSize = getComputedStyle(el).fontSize
+    }
+    if (!fontSize && this.container && typeof getComputedStyle === 'function') {
+      fontSize = getComputedStyle(this.container).fontSize
+    }
+    const size = parseFloat(fontSize)
+    if (Number.isFinite(size) && size > 0) {
+      item.responsiveFontSize_ = size
+      return size
+    }
+    return 0
+  }
+
+  _resizeResponsiveFontSize() {
+    const { responsiveFontSize } = this.config
+    if (!responsiveFontSize || !this._responsiveFontSizeBase) return
+
+    const currentSize = this._getResponsiveSize()
+    if (!currentSize) return
+    if (!this._responsiveFontSizeBase) {
+      this._responsiveFontSizeBase = currentSize
+      return
+    }
+
+    const options = typeof responsiveFontSize === 'object' ? responsiveFontSize : {}
+    const min = Number.isFinite(options.min) ? options.min : 0
+    const max = Number.isFinite(options.max) ? options.max : Infinity
+    const scale = currentSize / this._responsiveFontSizeBase
+    const resizeItem = (item, el) => {
+      if (item.mode === 'top' || item.mode === 'bottom') return
+
+      const base = this._getResponsiveFontSize(item, el)
+      if (!base) return
+
+      const size = Math.min(max, Math.max(min, base * scale))
+      const fontSize = `${size}px`
+      if (!item.style) item.style = {}
+      item.style.fontSize = fontSize
+      if (el) el.style.fontSize = fontSize
+    }
+
+    this.main.data.forEach((item) => resizeItem(item))
+    this.main.queue.forEach((item) => resizeItem(item.options, item.el))
+  }
+
   _bindPlayerEvents() {
     const { player } = this
 
@@ -151,7 +212,10 @@ export class DanmuJs extends BaseClass {
       }
     }
     const onPause = () => {
-      this._playerWaiting = false
+      if (this.status === 'playing') {
+        this.pause()
+        this._playerWaiting = true
+      }
     }
 
     this._playerEvents = [
@@ -576,6 +640,7 @@ export class DanmuJs extends BaseClass {
 
   resize() {
     this.logger && this.logger.info('resize')
+    this._resizeResponsiveFontSize()
     this.emit('channel_resize')
   }
 }

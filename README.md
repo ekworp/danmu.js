@@ -72,9 +72,13 @@
     mouseControl: true, // 打开鼠标控制, 打开后可监听到 bullet_hover 事件。danmu.on('bullet_hover', function (data) {})
     mouseControlPause: false, // 鼠标触摸暂停。mouseControl: true 生效
     //bOffset: 1000, // 可调节弹幕横向间隔（毫秒）
-    defaultOff: true, // 开启此项后弹幕不会初始化，默认初始化弹幕
-    chaseEffect: true // 开启滚动弹幕追逐效果, 默认为true
-  })
+     defaultOff: true, // 开启此项后弹幕不会初始化，默认初始化弹幕
+     chaseEffect: true, // 开启滚动弹幕追逐效果, 默认为true
+     responsiveFontSize: {
+       min: 12, // 可选，字体最小值(px)
+       max: 36 // 可选，字体最大值(px)
+     } // 根据容器主方向尺寸连续缩放普通弹幕字体
+   })
   ```
 
 这是 danmu.js 的 npm 使用方法，cdn 使用可以参考示例。[DEMO](https://github.com/bytedance/danmu.js/tree/master/demo/index.html)
