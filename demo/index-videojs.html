@@ -167,6 +167,35 @@
       // Keep the danmu layer inside Video.js's fullscreen element.
       player.el().appendChild(container)
 
+      const defaultComments = [
+        '视频开始',
+        'Video.js 弹幕测试',
+        'danmu.js 正在播放',
+        '观察弹幕滚动效果',
+        '支持全屏播放',
+        '支持暂停和继续',
+        '弹幕轨道自动分配',
+        '窗口变化会重新排版',
+        '字体大小可以响应式调整',
+        '正在进行播放同步',
+        '中途可以拖动进度条',
+        '弹幕时间跟随视频',
+        '支持实时发送弹幕',
+        '也可以发送优先弹幕',
+        '下面测试更长的弹幕内容',
+        'Video.js 原生视频适配',
+        '弹幕容器位于播放器内部',
+        '全屏退出后仍保持显示',
+        '继续观察滚动是否平滑',
+        '默认序列即将结束',
+        '视频播放到 60 秒'
+      ].map((txt, index) => ({
+        id: `default-${index}`,
+        start: index * 3000,
+        duration: 9000,
+        txt
+      }))
+
       const danmu = new DanmuJs({
         container,
         player: videoElement,
@@ -183,12 +212,7 @@
           start: 0.02,
           end: 0.98
         },
-        comments: [
-          { id: 'videojs-1', start: 1000, duration: 9000, txt: 'Video.js 弹幕测试' },
-          { id: 'videojs-2', start: 3000, duration: 9000, txt: 'danmu.js + Video.js' },
-          { id: 'videojs-3', start: 6000, duration: 9000, txt: '观察弹幕滚动是否平滑' },
-          { id: 'videojs-4', start: 9000, duration: 9000, txt: '支持暂停、继续和实时发送' }
-        ]
+        comments: defaultComments
       })
 
       let nextId = 1
