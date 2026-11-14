@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>danmu.js + Video.js</title>
+    <link
+      href="https://vjs.zencdn.net/8.23.4/video-js.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      body {
+        margin: 0;
+        padding: 24px;
+        background: #f5f6f8;
+        color: #1f2937;
+      }
+
+      .page {
+        width: min(960px, 100%);
+        margin: 0 auto;
+      }
+
+      .player-wrap {
+        position: relative;
+        overflow: hidden;
+        background: #000;
+      }
+
+      #danmu {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        pointer-events: none;
+        color: #000;
+        font-size: 16px;
+      }
+
+      #danmu > div {
+        pointer-events: auto;
+        color: #000 !important;
+        -webkit-text-stroke: 0.75px rgb(255 255 255 / 75%);
+        paint-order: stroke fill;
+        text-shadow:
+          -1px -1px 0 rgb(255 255 255 / 75%),
+          1px -1px 0 rgb(255 255 255 / 75%),
+          -1px 1px 0 rgb(255 255 255 / 75%),
+          1px 1px 0 rgb(255 255 255 / 75%);
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 16px;
+      }
+
+      button {
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        padding: 8px 12px;
+        background: #fff;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #f3f4f6;
+      }
+
+      #status {
+        margin-top: 12px;
+        color: #6b7280;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <h1>danmu.js + Video.js</h1>
+      <div class="player-wrap">
+        <video
+          id="videojs-player"
+          class="video-js vjs-default-skin"
+          controls
+          playsinline
+          preload="auto"
+          width="960"
+          height="540"
+        >
+          <source
+            src="https://vjs.zencdn.net/v/oceans.mp4"
+            type="video/mp4"
+          />
+          您的浏览器不支持 HTML5 视频播放。
+        </video>
+        <div id="danmu" aria-label="弹幕区域"></div>
+      </div>
+
+      <div class="controls">
+        <button type="button" id="danmu-start">开始弹幕</button>
+        <button type="button" id="danmu-pause">暂停弹幕</button>
+        <button type="button" id="danmu-play">继续弹幕</button>
+        <button type="button" id="danmu-stop">停止弹幕</button>
+        <button type="button" id="danmu-send">发送实时弹幕</button>
+        <button type="button" id="danmu-burst">发送 100 条弹幕</button>
+      </div>
+      <div id="status">正在初始化 Video.js…</div>
+    </main>
+
+    <script src="https://vjs.zencdn.net/8.23.4/video.min.js"></script>
+    <script type="module">
+      import DanmuJs from '../browser/index.mjs'
+
+      const status = document.querySelector('#status')
+      const container = document.querySelector('#danmu')
+      const videoElement = document.querySelector('#videojs-player')
+      const player = window.videojs(videoElement)
+
+      // Keep the danmu layer inside Video.js's fullscreen element.
+      player.el().appendChild(container)
+
+      const danmu = new DanmuJs({
+        container,
+        player: videoElement,
+        needResizeObserver: true,
+        channelSize: 20,
+        responsiveFontSize: true,
+        area: {
+          start: 0.02,
+          end: 0.98
+        },
+        comments: [
+          { id: 'videojs-1', start: 1000, duration: 9000, txt: 'Video.js 弹幕测试' },
+          { id: 'videojs-2', start: 3000, duration: 9000, txt: 'danmu.js + Video.js' },
+          { id: 'videojs-3', start: 6000, duration: 9000, txt: '观察弹幕滚动是否平滑' },
+          { id: 'videojs-4', start: 9000, duration: 9000, txt: '支持暂停、继续和实时发送' }
+        ]
+      })
+
+      let nextId = 1
+
+      function updateStatus(message) {
+        status.textContent = `${message} · ${player.currentTime().toFixed(1)}s`
+      }
+
+      danmu.on('ready', () => updateStatus('danmu.js 已就绪'))
+      danmu.on('bullet_start', () => updateStatus('弹幕播放中'))
+      danmu.on('bullet_hover', ({ bullet }) => {
+        console.log('hover bullet:', bullet)
+      })
+
+      document.querySelector('#danmu-start').addEventListener('click', () => {
+        danmu.start()
+        updateStatus('弹幕已开始')
+      })
+      document.querySelector('#danmu-pause').addEventListener('click', () => {
+        danmu.pause()
+        updateStatus('弹幕已暂停')
+      })
+      document.querySelector('#danmu-play').addEventListener('click', () => {
+        danmu.play()
+        updateStatus('弹幕已继续')
+      })
+      document.querySelector('#danmu-stop').addEventListener('click', () => {
+        danmu.stop()
+        updateStatus('弹幕已停止')
+      })
+      document.querySelector('#danmu-send').addEventListener('click', () => {
+        const id = `realtime-${nextId++}`
+        danmu.sendComment({
+          id,
+          start: player.currentTime() * 1000,
+          duration: 8000,
+          realTime: true,
+          txt: `实时弹幕 ${id}`,
+          style: {
+            color: '#000'
+          }
+        })
+        updateStatus('已发送实时弹幕')
+      })
+      document.querySelector('#danmu-burst').addEventListener('click', () => {
+        const start = player.currentTime() * 1000
+        const textSeed = '批量弹幕测试海浪风景视频ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        for (let index = 0; index < 100; index++) {
+          const length = 6 + Math.floor(Math.random() * 30)
+          const text = Array.from({ length }, (_, charIndex) => {
+            return textSeed[(index + charIndex) % textSeed.length]
+          }).join('')
+
+          danmu.sendComment({
+            id: `burst-${nextId++}`,
+            // Spread the burst over 30 seconds instead of displaying all
+            // comments in the same scheduler tick.
+            start: start + index * 300,
+            duration: 10000,
+            txt: text,
+            style: {
+              color: '#000'
+            }
+          })
+        }
+        updateStatus('已发送 100 条弹幕')
+      })
+
+      player.on('play', () => danmu.play())
+      player.on('pause', () => danmu.pause())
+      player.on('ended', () => danmu.stop())
+
+      danmu.start()
+    </script>
+  </body>
+</html>
