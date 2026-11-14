@@ -1,4 +1,5 @@
 import EventEmitter from 'event-emitter'
+import type { CommentData, DanmuConfig, GlobalHooks } from './baseClass'
 import BaseClass from './baseClass'
 import Control from './control'
 import RecyclableDomList from './domRecycle'
@@ -13,7 +14,7 @@ import { addClass, deepCopy, isNumber, styleUtil } from './utils/util'
  */
 
 export class DanmuJs extends BaseClass {
-  constructor(options) {
+  constructor(options: Partial<DanmuConfig> = {}) {
     super()
 
     // logger
@@ -21,7 +22,7 @@ export class DanmuJs extends BaseClass {
     this.logger && this.logger.info(`danmu.js version: ${__VERSION__}`)
 
     // configure
-    const config: any = (this.config = {
+    const config: DanmuConfig = (this.config = {
       overlap: false,
       area: {
         start: 0,
@@ -31,7 +32,7 @@ export class DanmuJs extends BaseClass {
       hooks: undefined,
       live: false,
       comments: [],
-      direction: 'r2l',
+      direction: 'r2l' as const,
       needResizeObserver: false,
       dropStaleComments: false,
       channelSize: undefined,

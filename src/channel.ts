@@ -1,4 +1,5 @@
 import BaseClass from './baseClass'
+import type { DanmuJs } from './danmu'
 import { attachEventListener, hasOwnProperty, isNumber } from './utils/util'
 import { validAreaLineRule } from './utils/validator'
 
@@ -13,7 +14,7 @@ class Channel extends BaseClass {
   /**
    * @param {import('./danmu').DanmuJs} danmu
    */
-  constructor(danmu) {
+  constructor(danmu: DanmuJs) {
     super()
 
     this.setLogger('channel')

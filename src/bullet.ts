@@ -389,7 +389,7 @@ export class Bullet extends BaseClass {
       }
     }
   }
-  startMove(force) {
+  startMove(force = false) {
     if (!this.hasMove) {
       this.danmu.emit('bullet_start', this)
       this.hasMove = true

@@ -1,6 +1,8 @@
+import type { CommentData } from './baseClass'
 import BaseClass from './baseClass'
 import Bullet from './bullet'
 import Channel from './channel'
+import type { DanmuJs } from './danmu'
 import { hasOwnProperty } from './utils/util'
 
 // 单次尝试入轨弹幕数量越多，长任务及CPU耗时越多
@@ -15,10 +17,14 @@ const MAX_TRY_COUNT = 0
  * @type {Class}
  */
 class Main extends BaseClass {
+  data!: CommentData[]
+  playedData!: CommentData[]
+  queue!: Bullet[]
+
   /**
    * @param {import('./danmu').DanmuJs} danmu
    */
-  constructor(danmu) {
+  constructor(danmu: DanmuJs) {
     super()
     this.setLogger('main')
     this.danmu = danmu

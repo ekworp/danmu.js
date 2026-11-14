@@ -1,4 +1,5 @@
 import BaseClass from './baseClass'
+import type { DanmuJs } from './danmu'
 import Main from './main'
 import { createDom, hasOwnProperty } from './utils/util'
 
@@ -6,7 +7,7 @@ class Control extends BaseClass {
   /**
    * @param {import('./danmu').DanmuJs} danmu
    */
-  constructor(danmu) {
+  constructor(danmu: DanmuJs) {
     super()
     this.setLogger('control')
     this.danmu = danmu
