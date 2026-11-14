@@ -66,6 +66,37 @@ try {
     const topBefore = Number.parseFloat(container.children[0]?.style.top || '0')
     danmu.setFontSize(20, 24)
     const topAfter = Number.parseFloat(container.children[0]?.style.top || '0')
+    const syncContainer = document.createElement('div')
+    syncContainer.style.cssText = 'position:relative;width:640px;height:180px'
+    document.body.appendChild(syncContainer)
+    let mediaTime = 0
+    let mediaRate = 1
+    const mediaHandlers = new Map()
+    const adapter = {
+      currentTime: () => mediaTime,
+      playbackRate: () => mediaRate,
+      on(event, handler) {
+        mediaHandlers.set(event, handler)
+      },
+      off(event) {
+        mediaHandlers.delete(event)
+      }
+    }
+    const syncDanmu = new window.DanmuJs({
+      container: syncContainer,
+      comments: [],
+      defaultOff: true,
+      player: adapter
+    })
+    const syncInitial = syncDanmu.status
+    mediaHandlers.get('playing')?.()
+    const syncStarted = syncDanmu.status
+    mediaTime = 10
+    mediaHandlers.get('seeking')?.()
+    mediaRate = 2
+    mediaHandlers.get('ratechange')?.()
+    syncDanmu.destroy()
+    syncContainer.remove()
     danmu.pause()
     const paused = danmu.status
     danmu.play()
@@ -85,6 +116,8 @@ try {
       rendered,
       topBefore,
       topAfter,
+      syncInitial,
+      syncStarted,
       remainingNodes: container.children.length
     }
   })
@@ -99,6 +132,8 @@ try {
   assert.equal(result.rendered, 1)
   assert.ok(result.topBefore > 0)
   assert.ok(result.topAfter > 0)
+  assert.equal(result.syncInitial, 'idle')
+  assert.equal(result.syncStarted, 'playing')
   assert.equal(result.remainingNodes, 0)
   console.log('Browser integration checks passed')
   await context.close()

@@ -95,6 +95,19 @@ import DanmuJs, {
 } from 'danmu.js'
 ```
 
+播放器可以传入原生 `HTMLMediaElement`，也可以传入兼容播放器适配器：
+
+```ts
+const player = {
+  currentTime: () => video.currentTime,
+  playbackRate: () => video.playbackRate,
+  on: (event, handler) => video.addEventListener(event, handler),
+  off: (event, handler) => video.removeEventListener(event, handler)
+}
+```
+
+播放器发生 `seeking`、`seeked` 或 `ratechange` 时，弹幕会自动同步。
+
 浏览器项目建议优先使用普通 ESM 入口，由应用自己的构建工具处理依赖；需要直接通过浏览器加载时可使用 `danmu.js/browser`。项目不再发布 UMD/ES5 全局脚本版本。
 
 ### Properties
