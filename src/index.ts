@@ -1,5 +1,15 @@
 import DanmuJs from './danmu'
-import './style/index.scss'
+import css from './style/index.scss?inline'
+
+if (
+  typeof document !== 'undefined' &&
+  !document.querySelector('[data-danmu-js-style]')
+) {
+  const style = document.createElement('style')
+  style.setAttribute('data-danmu-js-style', '')
+  style.textContent = css
+  document.head.appendChild(style)
+}
 
 export type {
   CommentData,

@@ -75,6 +75,7 @@ try {
     danmu.destroy()
 
     return {
+      stylesInjected: document.querySelector('[data-danmu-js-style]') !== null,
       resized,
       destroyed,
       started,
@@ -89,6 +90,7 @@ try {
   })
 
   assert.equal(result.resized, true)
+  assert.equal(result.stylesInjected, true)
   assert.equal(result.destroyed, true)
   assert.equal(result.started, 'playing')
   assert.equal(result.paused, 'paused')
