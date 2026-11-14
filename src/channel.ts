@@ -100,7 +100,7 @@ class Channel extends BaseClass {
 
     // bullet on waiting room
     if (bulletBtn && bulletBtn.main) {
-      bulletBtn.main.queue.forEach((item) => {
+      bulletBtn.main.queue.forEach((item: any) => {
         item.remove()
       })
     }
@@ -108,14 +108,14 @@ class Channel extends BaseClass {
     if (self.channels && self.channels.length > 0) {
       ;['scroll', 'top', 'bottom'].forEach((key) => {
         for (let i = 0; i < self.channels.length; i++) {
-          self.channels[i].queue[key].forEach((item) => {
+          self.channels[i].queue[key].forEach((item: any) => {
             item.remove()
           })
         }
       })
     }
     if (bulletBtn && bulletBtn.main && bulletBtn.main.data) {
-      bulletBtn.main.data.forEach((item) => {
+      bulletBtn.main.data.forEach((item: any) => {
         item.attached_ = false
       })
     }
@@ -179,7 +179,7 @@ class Channel extends BaseClass {
    *
    * @param {import('./bullet').Bullet} bullet
    */
-  addBullet(bullet) {
+  addBullet(bullet: any) {
     const danmu = this.danmu
     const channels = this.channels
     let channelHeight, channelWidth, occupy
@@ -202,7 +202,9 @@ class Channel extends BaseClass {
         pos = -1
       for (let i = 0, max = channels.length; i < max; i++) {
         if (
-          channels[i].queue[bullet.mode].some((item) => item.id === bullet.id)
+          channels[i].queue[bullet.mode].some(
+            (item: any) => item.id === bullet.id
+          )
         ) {
           return {
             result: false,
@@ -375,7 +377,7 @@ class Channel extends BaseClass {
           delete bullet.bookChannelId
           if (danmu.player) {
             const dataList = danmu.bulletBtn.main.data
-            dataList.some((item) => {
+            dataList.some((item: any) => {
               if (item.id === bullet.id) {
                 delete item.bookChannelId
                 return true
@@ -409,19 +411,22 @@ class Channel extends BaseClass {
           let start = 0
           let deleteIndex = -1
           let deleteItem: any = null
-          this.danmu.bulletBtn.main.queue.forEach((item, index) => {
-            if (
-              !item.prior &&
-              !item.options.realTime &&
-              item.el &&
-              item.el.getBoundingClientRect().left > this.containerPos.right &&
-              item.start >= start
-            ) {
-              start = item.start
-              deleteIndex = index
-              deleteItem = item
+          this.danmu.bulletBtn.main.queue.forEach(
+            (item: any, index: number) => {
+              if (
+                !item.prior &&
+                !item.options.realTime &&
+                item.el &&
+                item.el.getBoundingClientRect().left >
+                  this.containerPos.right &&
+                item.start >= start
+              ) {
+                start = item.start
+                deleteIndex = index
+                deleteItem = item
+              }
             }
-          })
+          )
           if (deleteItem) {
             deleteItem.remove()
             this.removeBullet(deleteItem)
@@ -479,7 +484,7 @@ class Channel extends BaseClass {
               const nextAddTime = 2
               if (danmu.player) {
                 const dataList = danmu.bulletBtn.main.data
-                dataList.some((item) => {
+                dataList.some((item: any) => {
                   if (item.id === bullet.id) {
                     this.logger &&
                       this.logger.info(
@@ -505,7 +510,7 @@ class Channel extends BaseClass {
             const nextAddTime = 2
             if (danmu.player) {
               const dataList = danmu.bulletBtn.main.data
-              dataList.some((item) => {
+              dataList.some((item: any) => {
                 if (item.id === bullet.id) {
                   this.logger &&
                     this.logger.info(
@@ -531,7 +536,7 @@ class Channel extends BaseClass {
       }
     }
   }
-  removeBullet(bullet) {
+  removeBullet(bullet: any) {
     this.logger &&
       this.logger.info(`removeBullet ${bullet.options.txt || '[DOM Element]'}`)
 
@@ -547,7 +552,7 @@ class Channel extends BaseClass {
       if (channel) {
         channel.operating[bullet.mode] = true
         let i = -1
-        channel.queue[bullet.mode].some((item, index) => {
+        channel.queue[bullet.mode].some((item: any, index: number) => {
           if (item.id === bullet.id) {
             i = index
             return true
@@ -646,7 +651,7 @@ class Channel extends BaseClass {
     }
     self.resizing = true
 
-    function setItem(channels, i) {
+    function setItem(channels: any[], i: number) {
       channels[i] = {
         id: i,
         queue: {
@@ -663,19 +668,19 @@ class Channel extends BaseClass {
       }
     }
 
-    function updateChannelsLower(channels, fontSize) {
-      function updateTopScrollQueue(i) {
+    function updateChannelsLower(channels: any[], fontSize: number) {
+      function updateTopScrollQueue(i: number) {
         const items = ['scroll', 'top']
         items.forEach((key_) => {
-          self.channels[i].queue[key_].forEach((item) => {
+          self.channels[i].queue[key_].forEach((item: any) => {
             if (item.el) {
               channels[i].queue[key_].push(item)
             }
           })
         })
       }
-      function updateBottomQueue(i) {
-        self.channels[i].queue.bottom.forEach((item) => {
+      function updateBottomQueue(i: number) {
+        self.channels[i].queue.bottom.forEach((item: any) => {
           if (item.el) {
             channels[
               i + channels.length - self.channels.length
@@ -705,7 +710,7 @@ class Channel extends BaseClass {
       for (let i = 0; i < channels.length; i++) {
         const items = ['scroll', 'top', 'bottom']
         items.forEach((key) => {
-          channels[i].queue[key].forEach((item) => {
+          channels[i].queue[key].forEach((item: any) => {
             item.resized = false
           })
         })
@@ -718,7 +723,7 @@ class Channel extends BaseClass {
       }
     }
 
-    function updateChannelsGreater(channels, fontSize) {
+    function updateChannelsGreater(channels: any[], fontSize: number) {
       const items = ['scroll', 'top', 'bottom']
 
       for (let i = 0; i < channels.length; i++) {
@@ -732,34 +737,39 @@ class Channel extends BaseClass {
           } else {
             const num =
               key === 'bottom' ? i - channels.length + self.channels.length : i
-            self.channels[num].queue[key].forEach((item, index) => {
-              if (!item.el) {
-                return
-              }
-              channels[i].queue[key].push(item)
-              if (key === 'bottom') {
-                if (item.channel_id[0] + item.channel_id[1] - 1 === num) {
-                  const channel_id = [].concat(item.channel_id)
-                  item.channel_id = [
-                    channel_id[0] - self.channels.length + channels.length,
-                    channel_id[1]
-                  ]
-                  item.top = item.channel_id[0] * fontSize
-                  if (self.danmu.config.area && self.danmu.config.area.start) {
-                    item.top +=
-                      self.containerHeight * self.danmu.config.area.start
-                  }
-                  item.topInit()
+            self.channels[num].queue[key].forEach(
+              (item: any, index: number) => {
+                if (!item.el) {
+                  return
                 }
+                channels[i].queue[key].push(item)
+                if (key === 'bottom') {
+                  if (item.channel_id[0] + item.channel_id[1] - 1 === num) {
+                    const channel_id = [].concat(item.channel_id)
+                    item.channel_id = [
+                      channel_id[0] - self.channels.length + channels.length,
+                      channel_id[1]
+                    ]
+                    item.top = item.channel_id[0] * fontSize
+                    if (
+                      self.danmu.config.area &&
+                      self.danmu.config.area.start
+                    ) {
+                      item.top +=
+                        self.containerHeight * self.danmu.config.area.start
+                    }
+                    item.topInit()
+                  }
+                }
+                self.channels[num].queue[key].splice(index, 1)
               }
-              self.channels[num].queue[key].splice(index, 1)
-            })
+            )
           }
         })
       }
       for (let i = 0; i < channels.length; i++) {
         items.forEach((key) => {
-          channels[i].queue[key].forEach((item) => {
+          channels[i].queue[key].forEach((item: any) => {
             item.resized = false
           })
         })
@@ -781,7 +791,7 @@ class Channel extends BaseClass {
       self._cancelResizeTimer()
 
       if (bulletBtn.main.data) {
-        bulletBtn.main.data.forEach((item) => {
+        bulletBtn.main.data.forEach((item: any) => {
           if (item.bookChannelId) {
             delete item.bookChannelId
             self.logger &&

@@ -94,7 +94,7 @@ class Main extends BaseClass {
      *   bullet: Bullet
      * }} data
      */
-    const updateQueue = ({ bullet }) => {
+    const updateQueue = ({ bullet }: { bullet: Bullet }) => {
       const { data, queue } = this
       queue.some((item, index) => {
         if (item.id === bullet.id) {
@@ -118,7 +118,7 @@ class Main extends BaseClass {
     /**
      * @param {TransitionEvent} e
      */
-    const onTransitionEnd = (e) => {
+    const onTransitionEnd = (e: TransitionEvent) => {
       const bullet = this._getBulletByEvt(e)
 
       if (bullet) {
@@ -132,7 +132,7 @@ class Main extends BaseClass {
       /**
        * @param {MouseEvent} e
        */
-      const onMouseover = (e) => {
+      const onMouseover = (e: MouseEvent) => {
         const { danmu } = this
         let bullet
 
@@ -154,7 +154,7 @@ class Main extends BaseClass {
       this._events.push([container, 'mouseover', onMouseover])
     }
 
-    this._events.forEach((item) => {
+    this._events.forEach((item: any) => {
       if (item[0].addEventListener) {
         item[0].addEventListener(item[1], item[2], false)
       } else if (item[0].on) {
@@ -168,7 +168,7 @@ class Main extends BaseClass {
    */
   _unbindEvents() {
     if (this._events.length) {
-      this._events.forEach((item) => {
+      this._events.forEach((item: any) => {
         if (item[0].removeEventListener) {
           item[0].removeEventListener(item[1], item[2], false)
         } else if (item[0].off) {
@@ -265,12 +265,12 @@ class Main extends BaseClass {
     const channels = this.channel.channels
     if (channels && channels.length > 0) {
       ;['scroll', 'top', 'bottom'].forEach((key) => {
-        this.queue.forEach((item) => {
+        this.queue.forEach((item: Bullet) => {
           item.startMove()
           item.resized = true
         })
         for (let i = 0; i < channels.length; i++) {
-          channels[i].queue[key].forEach((item) => {
+          channels[i].queue[key].forEach((item: Bullet) => {
             item.resized = false
           })
         }
@@ -353,7 +353,8 @@ class Main extends BaseClass {
         // 高积分弹幕优先展示
         list.sort(
           (prev, cur) =>
-            (cur.prior && !prev.prior) || (cur.score || -1) - (prev.score || -1)
+            (cur.prior && !prev.prior ? 1 : 0) ||
+            (cur.score || -1) - (prev.score || -1)
         )
       }
 
@@ -474,7 +475,7 @@ class Main extends BaseClass {
    * @param {EventTarget} e
    * @private
    */
-  _getBulletByEvt(e) {
+  _getBulletByEvt(e: Event) {
     const target = e.target || e.srcElement
     const { queue } = this
 

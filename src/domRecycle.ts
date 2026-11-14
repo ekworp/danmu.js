@@ -11,7 +11,7 @@ export default class RecyclableDOMList {
     this.init(options)
   }
 
-  init(options) {
+  init(options: any) {
     this.idleList = []
     this.usingList = []
     this._id = 0
@@ -28,17 +28,17 @@ export default class RecyclableDOMList {
     return firseIdle
   }
 
-  unused(dom) {
+  unused(dom: HTMLElement) {
     const idx = this.usingList.indexOf(dom)
     if (idx < 0) {
       return
     }
     this.usingList.splice(idx, 1)
-    dom.style.opacity = 0
+    dom.style.opacity = '0'
     this.idleList.push(dom)
   }
 
-  _expand(size) {
+  _expand(size: number) {
     for (let i = 0; i < size; i++) {
       this.idleList.push(this.options.initDOM(this._id++))
     }
@@ -62,7 +62,7 @@ export default class RecyclableDOMList {
     }
   }
 
-  clearElementStyle(element) {
+  clearElementStyle(element: HTMLElement) {
     const ua = typeof window !== 'undefined' ? window.navigator.userAgent : null
     if (!ua) {
       return

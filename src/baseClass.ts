@@ -18,7 +18,7 @@ export interface CommentData {
   bookChannelId?: [number, number]
   disableCopyDOM?: boolean
   moveV?: number
-  style?: Record<string, string | number>
+  style?: Record<string, string | number | undefined>
   eventListeners?: Array<[string, EventListener]>
   like?: {
     el: HTMLElement

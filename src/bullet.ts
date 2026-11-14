@@ -22,7 +22,7 @@ export class Bullet extends BaseClass {
    * @param {import('./danmu').DanmuJs} danmu
    * @param {import('./baseClass').CommentData} options
    */
-  constructor(danmu, options: any = {}) {
+  constructor(danmu: any, options: any = {}) {
     super()
     const { container, recycler, config } = danmu
 
@@ -163,7 +163,7 @@ export class Bullet extends BaseClass {
               options.eventListeners &&
               options.eventListeners.length > 0
             ) {
-              options.eventListeners.forEach((eventListener) => {
+              options.eventListeners.forEach((eventListener: any) => {
                 copyDOM.addEventListener(
                   eventListener.event,
                   eventListener.listener,
@@ -223,7 +223,7 @@ export class Bullet extends BaseClass {
     return true
   }
 
-  updateOffset(val, dryRun = false) {
+  updateOffset(val: number, dryRun = false) {
     this.random = val
     const left = this.danmu.containerPos.width + val + 'px'
 
@@ -486,15 +486,15 @@ export class Bullet extends BaseClass {
     }
   }
 
-  setFontSize(size) {
+  setFontSize(size: string | number) {
     if (this.el) {
       this.el.style.fontSize = size
     }
   }
-  setLikeDom(el, style) {
+  setLikeDom(el: HTMLElement, style: Record<string, string | number> = {}) {
     if (el) {
       Object.keys(style).forEach((key) => {
-        el.style[key] = style[key]
+        styleUtil(el, key, style[key])
       })
       const likeClass = 'danmu-like'
       el.className = likeClass

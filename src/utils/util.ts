@@ -127,7 +127,12 @@ export function copyDom(dom: HTMLElement): HTMLElement | string {
   }
 }
 
-function offInDestroy(object, event, fn, offEvent) {
+function offInDestroy(
+  object: any,
+  event: string,
+  fn: (data?: any) => void,
+  offEvent: string
+) {
   function onDestroy() {
     object.off(event, fn)
     object.off(offEvent, onDestroy)
@@ -145,7 +150,7 @@ export function attachEventListener(
     object.on(event, fn)
     offInDestroy(object, event, fn, offEvent)
   } else {
-    const _fn = (data) => {
+    const _fn = (data: any) => {
       fn(data)
       object.off(event, _fn)
     }
@@ -161,7 +166,7 @@ export function attachEventListener(
 export function styleUtil(
   elem: HTMLElement,
   name: string,
-  value: string | number
+  value: string | number | undefined
 ): void {
   const style = elem.style
   try {

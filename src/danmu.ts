@@ -123,7 +123,7 @@ export class DanmuJs extends BaseClass {
   /**
    * @param {GlobalHooks} options
    */
-  hooks(options) {
+  hooks(options: GlobalHooks) {
     deepCopy(this.globalHooks, options)
   }
 
@@ -143,7 +143,7 @@ export class DanmuJs extends BaseClass {
     return this.direction === 'b2t' ? rect.height : rect.width
   }
 
-  _getResponsiveFontSize(item, el) {
+  _getResponsiveFontSize(item: any, el?: HTMLElement) {
     if (item.responsiveFontSize_) {
       return item.responsiveFontSize_
     }
@@ -227,7 +227,7 @@ export class DanmuJs extends BaseClass {
       ['playing', onPlaying],
       ['pause', onPause]
     ]
-    this._playerEvents.forEach(([event, handler]) => {
+    this._playerEvents.forEach(([event, handler]: [string, EventListener]) => {
       player.addEventListener(event, handler)
     })
   }
@@ -237,7 +237,7 @@ export class DanmuJs extends BaseClass {
       return
     }
 
-    this._playerEvents.forEach(([event, handler]) => {
+    this._playerEvents.forEach(([event, handler]: [string, EventListener]) => {
       this.player.removeEventListener(event, handler)
     })
     this._playerEvents = []
@@ -285,7 +285,7 @@ export class DanmuJs extends BaseClass {
   /**
    * @param {CommentData} comment
    */
-  sendComment(comment) {
+  sendComment(comment: CommentData) {
     const { main, logger } = this
     logger && logger.info(`sendComment: ${comment.txt || '[DOM Element]'}`)
 
@@ -332,11 +332,11 @@ export class DanmuJs extends BaseClass {
     }
   }
 
-  setCommentID(oldID, newID) {
+  setCommentID(oldID: string, newID: string) {
     this.logger &&
       this.logger.info(`setCommentID: oldID ${oldID} newID ${newID}`)
     if (oldID && newID) {
-      this.main.data.some((data) => {
+      this.main.data.some((data: CommentData) => {
         if (data.id === oldID) {
           data.id = newID
           return true
@@ -344,7 +344,7 @@ export class DanmuJs extends BaseClass {
           return false
         }
       })
-      this.main.queue.some((item) => {
+      this.main.queue.some((item: any) => {
         if (item.id === oldID) {
           item.id = newID
           item.pauseMove()
@@ -357,13 +357,13 @@ export class DanmuJs extends BaseClass {
     }
   }
 
-  setCommentDuration(id, duration) {
+  setCommentDuration(id: string, duration: number) {
     this.logger &&
       this.logger.info(`setCommentDuration: id ${id} duration ${duration}`)
 
     if (id && duration) {
       duration = duration ? duration : 5000
-      this.main.data.some((data) => {
+      this.main.data.some((data: CommentData) => {
         if (data.id === id) {
           data.duration = duration
           return true
@@ -371,7 +371,7 @@ export class DanmuJs extends BaseClass {
           return false
         }
       })
-      this.main.queue.some((item) => {
+      this.main.queue.some((item: any) => {
         if (item.id === id) {
           item.duration = duration
           item.pauseMove()
@@ -384,10 +384,10 @@ export class DanmuJs extends BaseClass {
     }
   }
 
-  setCommentLike(id, like) {
+  setCommentLike(id: string, like: NonNullable<CommentData['like']>) {
     this.logger && this.logger.info(`setCommentLike: id ${id} like ${like}`)
     if (id && like) {
-      this.main.data.some((data) => {
+      this.main.data.some((data: CommentData) => {
         if (data.id === id) {
           data.like = like
           return true
@@ -395,7 +395,7 @@ export class DanmuJs extends BaseClass {
           return false
         }
       })
-      this.main.queue.some((item) => {
+      this.main.queue.some((item: any) => {
         if (item.id === id) {
           item.pauseMove()
           item.setLikeDom(like.el, like.style)
@@ -410,7 +410,7 @@ export class DanmuJs extends BaseClass {
     }
   }
 
-  restartComment(id) {
+  restartComment(id: string) {
     this.logger && this.logger.info(`restartComment: id ${id}`)
 
     if (id) {
@@ -423,7 +423,7 @@ export class DanmuJs extends BaseClass {
         return
       }
 
-      main.queue.some((item) => {
+      main.queue.some((item: any) => {
         if (item.id === id) {
           if (main.status !== 'paused') {
             item.startMove(true)
@@ -441,7 +441,7 @@ export class DanmuJs extends BaseClass {
   /**
    * @private
    */
-  _releaseCtrl(id) {
+  _releaseCtrl(id: string) {
     if (this.freezeId && id === this.freezeId) {
       this.mouseControl = false
       this.freezeId = null
@@ -451,18 +451,18 @@ export class DanmuJs extends BaseClass {
   /**
    * @private
    */
-  _freezeCtrl(id) {
+  _freezeCtrl(id: string) {
     this.mouseControl = true
     this.freezeId = id
   }
 
-  freezeComment(id) {
+  freezeComment(id: string) {
     this.logger && this.logger.info(`freezeComment: id ${id}`)
 
     if (id) {
       this._freezeCtrl(id)
 
-      this.main.queue.some((item) => {
+      this.main.queue.some((item: any) => {
         if (item.id === id) {
           item.status = 'forcedPause'
           item.pauseMove()
@@ -477,7 +477,7 @@ export class DanmuJs extends BaseClass {
     }
   }
 
-  removeComment(id) {
+  removeComment(id: string) {
     this.logger && this.logger.info(`removeComment: id ${id}`)
 
     if (id) {
@@ -486,7 +486,7 @@ export class DanmuJs extends BaseClass {
       this._releaseCtrl(id)
 
       // remove bullet from the queue list
-      main.queue = main.queue.filter((item) => {
+      main.queue = main.queue.filter((item: any) => {
         if (item.id === id) {
           item.remove()
           return false
@@ -496,7 +496,7 @@ export class DanmuJs extends BaseClass {
       })
 
       // remove comment from the data list
-      main.data = main.data.filter((item) => item.id !== id)
+      main.data = main.data.filter((item: CommentData) => item.id !== id)
     }
   }
 
@@ -504,7 +504,7 @@ export class DanmuJs extends BaseClass {
    * @param {Array<CommentData>} comments
    * @param {boolean} isClear
    */
-  updateComments(comments, isClear = true) {
+  updateComments(comments: CommentData[], isClear = true) {
     this.logger &&
       this.logger.info(`updateComments: ${comments.length}, isClear ${isClear}`)
     const { main } = this
@@ -520,7 +520,7 @@ export class DanmuJs extends BaseClass {
    * 设置所有弹幕播放时长
    * @param {number} duration
    */
-  setAllDuration(mode = 'scroll', duration, force = true) {
+  setAllDuration(mode: any = 'scroll', duration: number, force = true) {
     this.logger &&
       this.logger.info(
         `setAllDuration: mode ${mode} duration ${duration} force ${force}`
@@ -530,12 +530,12 @@ export class DanmuJs extends BaseClass {
       if (force) {
         this.main.forceDuration = duration
       }
-      this.main.data.forEach((data) => {
+      this.main.data.forEach((data: CommentData) => {
         if (mode === data.mode) {
           data.duration = duration
         }
       })
-      this.main.queue.forEach((item) => {
+      this.main.queue.forEach((item: any) => {
         if (mode === item.mode) {
           item.duration = duration
           item.pauseMove()
@@ -551,11 +551,11 @@ export class DanmuJs extends BaseClass {
    * 设置弹幕播放速率，在弹幕播放速度上乘以一个系数，控制速度的变化
    * @param {number} val
    */
-  setPlayRate(mode = 'scroll', val) {
+  setPlayRate(mode: any = 'scroll', val: number) {
     this.logger && this.logger.info(`setPlayRate: ${val}`)
     if (isNumber(val) && val > 0) {
       this.main.playRate = val
-      this.main.queue.forEach((item) => {
+      this.main.queue.forEach((item: any) => {
         if (mode === item.mode) {
           item.pauseMove()
           if (this.main.status !== 'paused') {
@@ -566,7 +566,7 @@ export class DanmuJs extends BaseClass {
     }
   }
 
-  setOpacity(opacity) {
+  setOpacity(opacity: string) {
     this.logger && this.logger.info(`setOpacity: opacity ${opacity}`)
 
     if (this.container) {
@@ -575,8 +575,8 @@ export class DanmuJs extends BaseClass {
   }
 
   setFontSize(
-    size,
-    channelSize,
+    size: number,
+    channelSize: number,
     options = {
       reflow: true
     }
@@ -585,12 +585,12 @@ export class DanmuJs extends BaseClass {
       this.logger.info(`setFontSize: size ${size} channelSize ${channelSize}`)
     this.fontSize = `${size}px`
     if (size) {
-      this.main.data.forEach((data) => {
+      this.main.data.forEach((data: CommentData) => {
         if (data.style) {
           data.style.fontSize = this.fontSize
         }
       })
-      this.main.queue.forEach((item) => {
+      this.main.queue.forEach((item: any) => {
         if (!item.options.style) {
           item.options.style = {}
         }
@@ -612,7 +612,7 @@ export class DanmuJs extends BaseClass {
     }
   }
 
-  setArea(area) {
+  setArea(area: DanmuConfig['area'] & { reflow?: boolean }) {
     this.logger && this.logger.info(`setArea: area ${area}`)
     this.config.area = area
 
@@ -627,9 +627,9 @@ export class DanmuJs extends BaseClass {
       this.hideArr.push(mode)
     }
     const arr = this.main.queue.filter(
-      (item) => mode === item.mode || (mode === 'color' && item.color)
+      (item: any) => mode === item.mode || (mode === 'color' && item.color)
     )
-    arr.forEach((item) => item.remove())
+    arr.forEach((item: any) => item.remove())
   }
 
   show(mode = 'scroll') {
@@ -643,7 +643,7 @@ export class DanmuJs extends BaseClass {
   /**
    * @param {'r2l'|'b2t'} direction
    */
-  setDirection(direction = 'r2l') {
+  setDirection(direction: DanmuConfig['direction'] = 'r2l') {
     this.logger && this.logger.info(`setDirection: direction ${direction}`)
     this.direction = direction
     // this.main.channel.resize()
