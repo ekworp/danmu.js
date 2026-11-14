@@ -12,7 +12,7 @@ const shared = {
   },
   dts: false,
   minify: true,
-  sourcemap: true,
+  sourcemap: false,
   clean: true,
   fixedExtension: true,
   outputOptions: {
