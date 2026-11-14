@@ -422,7 +422,7 @@ class Main extends BaseClass {
   keepPoolWatermark() {
     const { config, player } = this.danmu
     const { data } = this
-    const priorComments = []
+    const priorComments: any[] = []
     let deleteCount = 0
 
     // Support data pool to control watermark automatically

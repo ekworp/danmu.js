@@ -1,6 +1,8 @@
 import { throttle } from './utils/util'
 
 class ResizeObserverWrapper {
+  [key: string]: any
+
   constructor() {
     this.__handlers = []
     if (typeof ResizeObserver === 'undefined') {
@@ -38,7 +40,7 @@ class ResizeObserverWrapper {
     }
   }
 
-  unObserver(target) {
+  unObserver(target, _handler?) {
     if (!target) {
       return
     }
@@ -52,7 +54,7 @@ class ResizeObserverWrapper {
     i > -1 && this.__handlers.splice(i, 1)
   }
 
-  destroyObserver() {
+  destroyObserver(_target?, _handler?) {
     this.observer && this.observer.disconnect()
     this.observer = null
     this.__handlers = null
@@ -88,11 +90,11 @@ function addObserver(target, handler) {
   resizeObserver.addObserver(target, handler)
 }
 
-function unObserver(target, handler) {
+function unObserver(target, handler?) {
   resizeObserver.unObserver(target, handler)
 }
 
-function destroyObserver(target, handler) {
+function destroyObserver(target?, handler?) {
   resizeObserver.destroyObserver(target, handler)
 }
 

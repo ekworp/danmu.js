@@ -34,7 +34,9 @@
       "suspicious": {
         "noShadowRestrictedNames": "off",
         "useIterableCallbackReturn": "off",
-        "noAssignInExpressions": "off"
+        "noAssignInExpressions": "off",
+        "noExplicitAny": "off",
+        "noImplicitAnyLet": "off"
       },
       "correctness": {
         "noConstructorReturn": "off",

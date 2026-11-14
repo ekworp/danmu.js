@@ -22,7 +22,7 @@ export class Bullet extends BaseClass {
    * @param {import('./danmu').DanmuJs} danmu
    * @param {import('./baseClass').CommentData} options
    */
-  constructor(danmu, options = {}) {
+  constructor(danmu, options: any = {}) {
     super()
     const { container, recycler, config } = danmu
 

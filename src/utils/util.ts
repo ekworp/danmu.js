@@ -97,7 +97,7 @@ export function deepCopy(dst, src) {
 }
 
 export function typeOf(obj) {
-  return Object.prototype.toString.call(obj).match(/([^\s.*]+)(?=]$)/g)[0]
+  return Object.prototype.toString.call(obj).match(/([^\s.*]+)(?=]$)/g)?.[0]
 }
 
 export function copyDom(dom) {
@@ -179,6 +179,6 @@ export function throttle(func, wait) {
   let timer = 0
   return (...args) => {
     clearTimeout(timer)
-    timer = setTimeout(() => func.apply(this, args), wait)
+    timer = setTimeout(() => func.apply(undefined, args), wait)
   }
 }

@@ -21,7 +21,7 @@ export class DanmuJs extends BaseClass {
     this.logger && this.logger.info(`danmu.js version: ${__VERSION__}`)
 
     // configure
-    const config = (this.config = {
+    const config: any = (this.config = {
       overlap: false,
       area: {
         start: 0,
@@ -61,7 +61,7 @@ export class DanmuJs extends BaseClass {
     // freezed comment
     this.freezeId = null
 
-    config.comments.forEach((comment) => {
+    config.comments.forEach((comment: any) => {
       comment.duration = comment.duration ? comment.duration : 5000
       if (!comment.mode) {
         comment.mode = 'scroll'
@@ -78,7 +78,7 @@ export class DanmuJs extends BaseClass {
     if (!this.container) {
       // eslint-disable-next-line quotes
       this.emit('error', "container id can't be empty")
-      return false
+      return
     }
     if (config.containerStyle) {
       const style = config.containerStyle
@@ -179,7 +179,7 @@ export class DanmuJs extends BaseClass {
     const min = Number.isFinite(options.min) ? options.min : 0
     const max = Number.isFinite(options.max) ? options.max : Infinity
     const scale = currentSize / this._responsiveFontSizeBase
-    const resizeItem = (item, el) => {
+    const resizeItem = (item: any, el: any = undefined) => {
       if (item.mode === 'top' || item.mode === 'bottom') return
 
       const base = this._getResponsiveFontSize(item, el)
@@ -192,8 +192,8 @@ export class DanmuJs extends BaseClass {
       if (el) el.style.fontSize = fontSize
     }
 
-    this.main.data.forEach((item) => resizeItem(item))
-    this.main.queue.forEach((item) => resizeItem(item.options, item.el))
+    this.main.data.forEach((item: any) => resizeItem(item))
+    this.main.queue.forEach((item: any) => resizeItem(item.options, item.el))
   }
 
   _bindPlayerEvents() {

@@ -134,7 +134,8 @@ class Channel extends BaseClass {
         self.resetId = null
       }
 
-      const { channelSize, channelCount, channels } = self._initChannels()
+      const { channelSize, channelCount, channels } =
+        self._initChannels() as any
 
       self.channelCount = channelCount
       self.channels = channels
@@ -407,7 +408,7 @@ class Channel extends BaseClass {
           // 找到应该被删的 danmu
           let start = 0
           let deleteIndex = -1
-          let deleteItem = null
+          let deleteItem: any = null
           this.danmu.bulletBtn.main.queue.forEach((item, index) => {
             if (
               !item.prior &&
@@ -572,7 +573,7 @@ class Channel extends BaseClass {
   /**
    * @private
    */
-  _initChannels() {
+  _initChannels(): any {
     if (!this.danmu || !this.danmu.config) {
       return
     }
@@ -612,7 +613,7 @@ class Channel extends BaseClass {
       }
     }
 
-    const channels = []
+    const channels: any[] = []
     for (let i = 0; i < channelCount; i++) {
       channels[i] = {
         id: i,

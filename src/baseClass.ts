@@ -1,6 +1,9 @@
 import Log from './utils/logger'
 
 class BaseClass {
+  [key: string]: any
+  logger!: Log
+
   setLogger(logger) {
     this.logger =
       logger instanceof Log ? logger : new Log((logger || '') + '.js')

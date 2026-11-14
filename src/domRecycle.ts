@@ -1,7 +1,9 @@
 import { hasOwnProperty, styleUtil } from './utils/util'
 
 export default class RecyclableDOMList {
-  constructor(options) {
+  [key: string]: any
+
+  constructor(options = {}) {
     options = {
       initDOM: () => document.createElement('div'),
       initSize: 10
