@@ -103,7 +103,7 @@ export class Bullet extends BaseClass {
       this._lastMoveTime &&
       this._fullySlideInScreenDuration > 0
     ) {
-      const now = new Date().getTime()
+      const now = Date.now()
       const diff = (now - this._lastMoveTime) / 1000
 
       if (diff >= this._fullySlideInScreenDuration) {
@@ -131,7 +131,7 @@ export class Bullet extends BaseClass {
 
     // The use of translate3d pushes css animations into hardware acceleration for more power!
     // Use 'perspective' to try to fix flickering problem after switching to the transform above
-    style['perspective'] = '500em'
+    style.perspective = '500em'
 
     // !!! 'backface-visibility' will cause translateX/Y stop rendering in firefox
     // style['backfaceVisibility'] = 'hidden'
@@ -198,7 +198,7 @@ export class Bullet extends BaseClass {
       offset = config.bulletOffset
     } else {
       const containerPos = danmu.containerPos
-      offset = containerPos.width / 10 > 100 ? 100 : containerPos.width / 10
+      offset = Math.min(containerPos.width / 10, 100)
     }
     const random = options.realTime ? 0 : Math.floor(Math.random() * offset)
     const left = this.updateOffset(random, true)
@@ -332,7 +332,7 @@ export class Bullet extends BaseClass {
     if (this.mode === 'scroll') {
       const ctPos = this.danmu.containerPos
       if (isFullscreen) {
-        const pastDuration = (new Date().getTime() - this._lastMoveTime) / 1000
+        const pastDuration = (Date.now() - this._lastMoveTime) / 1000
         const pastS = pastDuration * this.moveV
         let ratio = 0
         let nowS = 0
@@ -388,8 +388,7 @@ export class Bullet extends BaseClass {
       if (!this.pastDuration || !this.startTime) {
         this.pastDuration = 1
       } else {
-        this.pastDuration =
-          this.pastDuration + new Date().getTime() - this.startTime
+        this.pastDuration = this.pastDuration + Date.now() - this.startTime
       }
     }
   }
@@ -422,7 +421,7 @@ export class Bullet extends BaseClass {
           'transform',
           `translateX(-${this.top}px) translateY(-${this.height}px) translateZ(0px) rotate(90deg)`
         )
-        this._lastMoveTime = new Date().getTime()
+        this._lastMoveTime = Date.now()
         this.moveMoreS = bulletPos.top - ctPos.top
         this.moveContainerHeight = ctPos.height
       } else {
@@ -442,7 +441,7 @@ export class Bullet extends BaseClass {
             `translateX(-${leftDistance}px) translateY(0px) translateZ(0px)`
           )
 
-          this._lastMoveTime = new Date().getTime()
+          this._lastMoveTime = Date.now()
           this.moveMoreS = bulletPos.left - ctPos.left
           this.moveContainerWidth = ctPos.width
         } else {
@@ -453,7 +452,7 @@ export class Bullet extends BaseClass {
 
       this._fullySlideInScreenDuration = fullyMovedToScreenDistance / this.moveV
     } else {
-      const newTimestamp = new Date().getTime()
+      const newTimestamp = Date.now()
       const leftDuration =
         (this.startTime && newTimestamp - this.startTime > this.duration
           ? newTimestamp - this.startTime
@@ -489,7 +488,7 @@ export class Bullet extends BaseClass {
 
   setFontSize(size) {
     if (this.el) {
-      this.el.style['fontSize'] = size
+      this.el.style.fontSize = size
     }
   }
   setLikeDom(el, style) {

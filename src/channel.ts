@@ -373,12 +373,12 @@ class Channel extends BaseClass {
         }
         if (bullet.prior) {
           this.logger && this.logger.info(bullet.id + '号优先弹幕运行完毕')
-          delete bullet['bookChannelId']
+          delete bullet.bookChannelId
           if (danmu.player) {
             const dataList = danmu.bulletBtn.main.data
             dataList.some((item) => {
               if (item.id === bullet.id) {
-                delete item['bookChannelId']
+                delete item.bookChannelId
                 return true
               } else {
                 return false
@@ -676,11 +676,11 @@ class Channel extends BaseClass {
         })
       }
       function updateBottomQueue(i) {
-        self.channels[i].queue['bottom'].forEach((item) => {
+        self.channels[i].queue.bottom.forEach((item) => {
           if (item.el) {
-            channels[i + channels.length - self.channels.length].queue[
-              'bottom'
-            ].push(item)
+            channels[
+              i + channels.length - self.channels.length
+            ].queue.bottom.push(item)
             if (item.channel_id[0] + item.channel_id[1] - 1 === i) {
               const channel_id = [].concat(item.channel_id)
               item.channel_id = [
@@ -784,7 +784,7 @@ class Channel extends BaseClass {
       if (bulletBtn.main.data) {
         bulletBtn.main.data.forEach((item) => {
           if (item.bookChannelId) {
-            delete item['bookChannelId']
+            delete item.bookChannelId
             self.logger &&
               self.logger.info('resize导致' + item.id + '号优先弹幕预定取消')
           }
