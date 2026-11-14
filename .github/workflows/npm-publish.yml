@@ -51,4 +51,4 @@ jobs:
         run: pnpm run build
 
       - name: Stage npm package
-        run: npm stage
+        run: npm stage publish .

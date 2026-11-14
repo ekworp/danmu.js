@@ -1,6 +1,6 @@
 {
   "name": "@ekworp/danmu.js",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "type": "module",
   "description": "HTML5 danmu (danmaku) plugin for any DOM element",
   "main": "./dist/index.cjs",
