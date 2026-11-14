@@ -94,7 +94,7 @@ export class DanmuJs extends BaseClass {
       comments: [],
       direction: 'r2l' as const,
       needResizeObserver: false,
-      dropStaleComments: false,
+      dropStaleComments: true,
       channelSize: undefined,
       maxCommentsLength: undefined,
       bulletOffset: undefined,
