@@ -33,7 +33,7 @@ class Control extends BaseClass {
     this.main.destroy()
     for (const k in this) {
       if (hasOwnProperty.call(this, k)) {
-        delete this[k]
+        Reflect.deleteProperty(this, k)
       }
     }
   }

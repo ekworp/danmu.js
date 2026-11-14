@@ -41,3 +41,16 @@ jobs:
 
       - name: Build package
         run: pnpm run build
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Browser integration test
+        run: node scripts/browser-integration.mjs
+        env:
+          BROWSER: chromium
+
+      - name: Browser performance baseline
+        run: node scripts/browser-bench.mjs
+        env:
+          BROWSER: chromium

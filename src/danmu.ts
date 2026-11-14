@@ -1,4 +1,3 @@
-import EventEmitter from 'event-emitter'
 import type {
   CommentData,
   CommentMode,
@@ -26,22 +25,54 @@ const VERSION = typeof __VERSION__ === 'string' ? __VERSION__ : 'development'
  */
 
 export class DanmuJs extends BaseClass {
-  declare on: <K extends DanmuEventName>(
+  private readonly listeners = new Map<
+    DanmuEventName,
+    Set<DanmuEventHandler<unknown>>
+  >()
+
+  on<K extends DanmuEventName>(
     event: K,
     handler: DanmuEventHandler<DanmuEventMap[K]>
-  ) => this
-  declare once: <K extends DanmuEventName>(
+  ): this {
+    let handlers = this.listeners.get(event)
+    if (!handlers) {
+      handlers = new Set()
+      this.listeners.set(event, handlers)
+    }
+    handlers.add(handler as DanmuEventHandler<unknown>)
+    return this
+  }
+
+  once<K extends DanmuEventName>(
     event: K,
     handler: DanmuEventHandler<DanmuEventMap[K]>
-  ) => this
-  declare off: <K extends DanmuEventName>(
+  ): this {
+    const wrapped = ((data: unknown) => {
+      this.off(event, wrapped as DanmuEventHandler<DanmuEventMap[K]>)
+      handler(data as DanmuEventMap[K])
+    }) as DanmuEventHandler<DanmuEventMap[K]>
+    return this.on(event, wrapped)
+  }
+
+  off<K extends DanmuEventName>(
     event: K,
     handler: DanmuEventHandler<DanmuEventMap[K]>
-  ) => this
-  declare emit: <K extends DanmuEventName>(
+  ): this {
+    this.listeners.get(event)?.delete(handler as DanmuEventHandler<unknown>)
+    return this
+  }
+
+  emit<K extends DanmuEventName>(
     event: K,
     ...args: DanmuEventMap[K] extends undefined ? [] : [data: DanmuEventMap[K]]
-  ) => boolean
+  ): boolean {
+    const handlers = this.listeners.get(event)
+    if (!handlers) return false
+    for (const handler of [...handlers]) {
+      handler(args[0] as unknown)
+    }
+    return handlers.size > 0
+  }
 
   constructor(options: DanmuConfigOptions = {}) {
     super()
@@ -73,9 +104,6 @@ export class DanmuJs extends BaseClass {
       responsiveFontSize: false // 根据容器主方向尺寸连续缩放普通弹幕字体
     })
     deepCopy(config, options)
-
-    // Add event subscription handler
-    EventEmitter(this)
 
     /**
      * @type {GlobalHooks}
@@ -305,10 +333,11 @@ export class DanmuJs extends BaseClass {
     this.stop()
     this.bulletBtn && this.bulletBtn.destroy()
     this.recycler && this.recycler.destroy()
-    for (const k in this) {
-      delete this[k]
-    }
     this.emit('destroy')
+    this.listeners.clear()
+    for (const k in this) {
+      Reflect.deleteProperty(this, k)
+    }
   }
 
   /**
@@ -347,16 +376,15 @@ export class DanmuJs extends BaseClass {
         }
       }
       if (comment.prior || comment.realTime) {
-        main.data.unshift(comment)
+        main.insertComment(comment, true)
         if (comment.realTime) {
           main.readData()
           main.dataHandle()
         }
       } else {
-        main.data.push(comment)
+        main.insertComment(comment)
       }
 
-      main.sortData()
       main.keepPoolWatermark()
     }
   }

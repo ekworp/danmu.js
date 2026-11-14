@@ -60,7 +60,7 @@ typings/
 *.tgz
 
 # Playwright browser benchmark profile
-.cache/playwright/edge/
+.cache/playwright/
 
 # Yarn Integrity file
 .yarn-integrity

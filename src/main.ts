@@ -94,7 +94,7 @@ class Main extends BaseClass {
     this.channel && this.channel.destroy()
     this.data = []
     for (const k in this) {
-      delete this[k]
+      Reflect.deleteProperty(this, k)
     }
   }
 
@@ -408,7 +408,7 @@ class Main extends BaseClass {
             bullet.detach()
             for (const k in bullet) {
               if (hasOwnProperty.call(bullet, k)) {
-                delete bullet[k]
+                Reflect.deleteProperty(bullet, k)
               }
             }
             bullet = null
@@ -439,6 +439,26 @@ class Main extends BaseClass {
   }
   sortData() {
     this.data.sort((prev, cur) => (prev.start || -1) - (cur.start || -1))
+  }
+
+  insertComment(comment: CommentData, prioritize = false): void {
+    if (prioritize) {
+      this.data.unshift(comment)
+      return
+    }
+
+    let low = 0
+    let high = this.data.length
+    const start = comment.start || -1
+    while (low < high) {
+      const middle = (low + high) >>> 1
+      if ((this.data[middle].start || -1) <= start) {
+        low = middle + 1
+      } else {
+        high = middle
+      }
+    }
+    this.data.splice(low, 0, comment)
   }
 
   keepPoolWatermark() {

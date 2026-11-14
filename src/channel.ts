@@ -105,7 +105,7 @@ class Channel extends BaseClass {
     // clear prop at end
     for (const k in this) {
       if (hasOwnProperty.call(this, k)) {
-        delete this[k]
+        Reflect.deleteProperty(this, k)
       }
     }
   }

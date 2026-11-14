@@ -36,6 +36,7 @@
     "test:watch": "vitest",
     "bench": "node scripts/bench.mjs",
     "bench:browser": "pnpm run build && node scripts/browser-bench.mjs",
+    "test:browser": "pnpm run build && node scripts/browser-integration.mjs",
     "release": "pnpm run check && pnpm run typecheck && pnpm run test && pnpm run build && pnpm publish",
     "release:rc": "pnpm run release -- --tag rc"
   },
@@ -48,9 +49,6 @@
     "live commenting",
     "HTML5"
   ],
-  "dependencies": {
-    "event-emitter": "^0.3.7"
-  },
   "devDependencies": {
     "@biomejs/biome": "^2.6.7",
     "@rslib/core": "^1.0.6",

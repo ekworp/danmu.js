@@ -95,6 +95,7 @@ export interface DanmuEventMap {
   error: string
   destroy: undefined
   bullet_remove: { bullet: Bullet }
+  bullet_start: Bullet
   bullet_hover: { bullet: Bullet; event: MouseEvent }
   channel_resize: undefined
   changeDirection: DanmuConfig['direction']
@@ -111,9 +112,7 @@ export interface PlayerAdapter {
 }
 
 class BaseClass {
-  // Temporary compatibility boundary for legacy runtime fields. Core public
-  // APIs are explicitly typed; this can be removed after the internal classes
-  // are split into state objects.
+  // Temporary compatibility boundary for legacy runtime fields.
   [key: string]: any
   protected logger!: Log
 
