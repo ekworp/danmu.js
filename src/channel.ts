@@ -180,6 +180,28 @@ class Channel extends BaseClass {
     }
   }
 
+  refreshBulletPositions(channelSize?: number): void {
+    const size =
+      channelSize ||
+      (this.direction === 'b2t' ? this.channelWidth : this.channelHeight)
+    if (!size) return
+
+    const offset =
+      this.direction === 'b2t'
+        ? this.containerWidth * (this.danmu.config.area?.start || 0)
+        : this.containerHeight * (this.danmu.config.area?.start || 0)
+
+    for (const channel of this.channels) {
+      for (const mode of ['scroll', 'top', 'bottom'] as ChannelMode[]) {
+        for (const bullet of channel.queue[mode]) {
+          if (!bullet.el || !bullet.channel_id) continue
+          bullet.top = bullet.channel_id[0] * size + offset
+          bullet.topInit()
+        }
+      }
+    }
+  }
+
   updatePos() {
     const pos = this.container.getBoundingClientRect()
 
@@ -744,6 +766,7 @@ class Channel extends BaseClass {
       } else {
         self.channelHeight = fontSize
       }
+      self.refreshBulletPositions()
     }
 
     function updateChannelsGreater(channels: ChannelState[], fontSize: number) {
@@ -804,6 +827,7 @@ class Channel extends BaseClass {
       } else {
         self.channelHeight = fontSize
       }
+      self.refreshBulletPositions()
     }
 
     function layout() {

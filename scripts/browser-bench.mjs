@@ -74,6 +74,10 @@ try {
       'nodes after destroy': remainingNodes
     }))
   )
+  const maxElapsed = Number(process.env.BROWSER_BENCH_MAX_MS || 250)
+  if (result.some(({ elapsed, remainingNodes }) => elapsed > maxElapsed || remainingNodes !== 0)) {
+    throw new Error(`Browser benchmark exceeded ${maxElapsed} ms or leaked DOM nodes`)
+  }
   await browser.close()
 } finally {
   server.kill()

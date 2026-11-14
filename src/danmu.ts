@@ -654,14 +654,11 @@ export class DanmuJs extends BaseClass {
 
         item.options.style.fontSize = this.fontSize
         item.setFontSize(this.fontSize)
-        if (channelSize) {
-          item.top = item.channel_id[0] * channelSize
-          item.topInit()
-        }
       })
     }
     if (channelSize) {
       this.config.channelSize = channelSize
+      this.main.channel.refreshBulletPositions(channelSize)
 
       if (options.reflow) {
         this.main.channel.resizeSync()

@@ -39,6 +39,7 @@ try {
       container,
       comments: [],
       defaultOff: true,
+      area: { start: 0.02, end: 1 },
       player: { currentTime: 0 }
     })
     let resized = false
@@ -62,6 +63,9 @@ try {
     await new Promise(requestAnimationFrame)
     const started = danmu.status
     const rendered = danmu.state.bullets.length
+    const topBefore = Number.parseFloat(container.children[0]?.style.top || '0')
+    danmu.setFontSize(20, 24)
+    const topAfter = Number.parseFloat(container.children[0]?.style.top || '0')
     danmu.pause()
     const paused = danmu.status
     danmu.play()
@@ -78,6 +82,8 @@ try {
       played,
       stopped,
       rendered,
+      topBefore,
+      topAfter,
       remainingNodes: container.children.length
     }
   })
@@ -89,6 +95,8 @@ try {
   assert.equal(result.played, 'playing')
   assert.equal(result.stopped, 'closed')
   assert.equal(result.rendered, 1)
+  assert.ok(result.topBefore > 0)
+  assert.ok(result.topAfter > 0)
   assert.equal(result.remainingNodes, 0)
   console.log('Browser integration checks passed')
   await context.close()
