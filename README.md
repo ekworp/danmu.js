@@ -23,7 +23,7 @@
 
 - Step 2:
 
-  ```js
+   ```js
    import DanmuJs from '@ekworp/danmu.js'
 
   let danmujs = new DanmuJs({
@@ -36,7 +36,7 @@
     comments: [
       //弹幕预存数组,配合音视频元素（video或audio）同步使用时需提供该项
       {
-        duration: 20000, //弹幕持续显示时间,毫秒(最低为5000毫秒)
+        duration: 20000, //弹幕持续显示时间，单位为毫秒；默认值为5000
         //moveV: 100, //弹幕匀速移动速度(单位: px/秒)，设置该项时duration无效
         id: '1', //弹幕id，需唯一
         start: 2000, //弹幕出现时间（毫秒）
@@ -68,15 +68,16 @@
       end: 1, //区域底部到播放器顶部所占播放器高度的比例
       lines: undefined // 弹幕虚拟轨道显示行数。当指定行数时，显示范围 start/end 不生效；当弹幕字体大小超过所需要的总虚拟轨道数时，弹幕也不会出现在轨道上，因此请设置好弹幕fontSize及影响弹幕高度的其他样式，让弹幕和轨道高度匹配
     },
-     channelSize: 20, // 轨道大小，responsiveFontSize 开启时会同步缩放
+     needResizeObserver: true, // 容器尺寸变化时自动重新布局
+     channelSize: 20, // 默认轨道大小，responsiveFontSize 开启时会同步缩放
     mouseControl: true, // 打开鼠标控制, 打开后可监听到 bullet_hover 事件。danmu.on('bullet_hover', function (data) {})
     mouseControlPause: false, // 鼠标触摸暂停。mouseControl: true 生效
     //bOffset: 1000, // 可调节弹幕横向间隔（毫秒）
-      defaultOff: true, // 初始化时不启动；播放器开始播放后自动启动
-      dropStaleComments: true, // 丢弃视频当前时间之前的过期弹幕
-      maxVisibleBullets: Infinity, // 同时存在的最大弹幕数量
-      syncPlaybackRate: false, // 是否跟随播放器倍速调整弹幕速度
-     chaseEffect: true, // 开启滚动弹幕追逐效果, 默认为true
+       defaultOff: true, // 初始化时不启动；播放器开始播放后自动启动
+       dropStaleComments: true, // 丢弃视频当前时间之前的过期弹幕
+       maxVisibleBullets: Infinity, // 默认不限制同时存在的弹幕数量
+       syncPlaybackRate: false, // 是否跟随播放器倍速调整弹幕速度
+     chaseEffect: true, // 开启滚动弹幕追逐效果
      responsiveFontSize: {
        min: 12, // 可选，字体最小值(px)
        max: 36 // 可选，字体最大值(px)
@@ -84,7 +85,7 @@
    })
   ```
 
-这是 danmu.js 的 npm 使用方法，示例可以参考 [DEMO](https://github.com/bytedance/danmu.js/tree/master/demo/index.html)。
+这是 danmu.js 的 npm 使用方法，示例可以参考 [DEMO](https://github.com/ekworp/danmu.js/tree/main/demo/index.html)。
 
 当前 npm 包提供 ESM、CommonJS 和自包含现代浏览器 ESM 三种入口，并附带完整 TypeScript 声明：
 
@@ -92,7 +93,7 @@
 import DanmuJs, {
   type CommentData,
   type DanmuConfigOptions
- } from '@ekworp/danmu.js'
+} from '@ekworp/danmu.js'
 ```
 
 播放器可以传入原生 `HTMLMediaElement`，也可以传入兼容播放器适配器：
@@ -106,9 +107,11 @@ const player = {
 }
 ```
 
-播放器发生 `seeking`、`seeked` 或 `ratechange` 时，弹幕会自动同步。
+播放器发生 `playing`、`pause`、`seeking`、`seeked`、`timeupdate` 或 `ratechange` 时，弹幕会自动同步。
 
-浏览器项目建议优先使用普通 ESM 入口，由应用自己的构建工具处理依赖；需要直接通过浏览器加载时可使用 `@ekworp/danmu.js/browser`。项目不再发布 UMD/ES5 全局脚本版本。
+默认字体为 `16px`、黑色文字，并带有白色描边和阴影。浏览器项目建议优先使用普通 ESM 入口，由应用自己的构建工具处理依赖；需要直接通过浏览器加载时可使用 `@ekworp/danmu.js/browser`。项目不再发布 UMD/ES5 全局脚本版本。
+
+`maxVisibleBullets` 默认为 `Infinity`。高密度弹幕场景建议主动设置有限值，例如 `200`，以控制 DOM 数量和渲染性能。
 
 ### Properties
 
@@ -125,7 +128,7 @@ danmu.state : {
 ### API
 
 ```js
-danmu.start() //弹幕初始化并播放(内部默认已调用)
+danmu.start() // 初始化并播放；defaultOff 为 true 时需要手动调用
 danmu.pause() //弹幕暂停
 danmu.play() //弹幕继续播放
 danmu.stop() //弹幕停止并消失
@@ -189,7 +192,7 @@ danmu.setCommentLike(id, {
 我们为开发者提供了示例，使用方式如下：
 
 ```
-$ git clone git@github.com:bytedance/danmu.js.git
+$ git clone git@github.com:ekworp/danmu.js.git
 $ cd danmu.js
 $ pnpm install
 $ pnpm run check
