@@ -197,14 +197,18 @@ class Channel extends BaseClass {
         ? this.containerWidth * (this.danmu.config.area?.start || 0)
         : this.containerHeight * (this.danmu.config.area?.start || 0)
 
+    const bullets = new Set<Bullet>()
     for (const channel of this.channels) {
       for (const mode of ['scroll', 'top', 'bottom'] as ChannelMode[]) {
-        for (const bullet of channel.queue[mode]) {
-          if (!bullet.el || !bullet.channel_id) continue
-          bullet.top = bullet.channel_id[0] * size + offset
-          bullet.topInit()
-        }
+        channel.queue[mode].forEach((bullet: Bullet) => bullets.add(bullet))
       }
+    }
+    this.danmu.main?.queue?.forEach((bullet: Bullet) => bullets.add(bullet))
+
+    for (const bullet of bullets) {
+      if (!bullet.el || !bullet.channel_id) continue
+      bullet.top = bullet.channel_id[0] * size + offset
+      bullet.topInit()
     }
   }
 
@@ -793,33 +797,31 @@ class Channel extends BaseClass {
           } else {
             const num =
               key === 'bottom' ? i - channels.length + self.channels.length : i
-            self.channels[num].queue[key].forEach(
-              (item: Bullet, index: number) => {
-                if (!item.el) {
-                  return
-                }
-                channels[i].queue[key as ChannelMode].push(item)
-                if (key === 'bottom') {
-                  if (item.channel_id[0] + item.channel_id[1] - 1 === num) {
-                    const channel_id = [].concat(item.channel_id)
-                    item.channel_id = [
-                      channel_id[0] - self.channels.length + channels.length,
-                      channel_id[1]
-                    ]
-                    item.top = item.channel_id[0] * fontSize
-                    if (
-                      self.danmu.config.area &&
-                      self.danmu.config.area.start
-                    ) {
-                      item.top +=
-                        self.containerHeight * self.danmu.config.area.start
-                    }
-                    item.topInit()
-                  }
-                }
-                self.channels[num].queue[key].splice(index, 1)
+            const queue = [...self.channels[num].queue[key]]
+            queue.forEach((item: Bullet) => {
+              if (!item.el) {
+                return
               }
-            )
+              channels[i].queue[key as ChannelMode].push(item)
+              if (key === 'bottom') {
+                if (item.channel_id[0] + item.channel_id[1] - 1 === num) {
+                  const channel_id = [].concat(item.channel_id)
+                  item.channel_id = [
+                    channel_id[0] - self.channels.length + channels.length,
+                    channel_id[1]
+                  ]
+                  item.top = item.channel_id[0] * fontSize
+                  if (self.danmu.config.area && self.danmu.config.area.start) {
+                    item.top +=
+                      self.containerHeight * self.danmu.config.area.start
+                  }
+                  item.topInit()
+                }
+              }
+            })
+            self.channels[num].queue[key] = self.channels[num].queue[
+              key
+            ].filter((item: Bullet) => !queue.includes(item))
           }
         })
       }
