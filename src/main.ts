@@ -39,6 +39,7 @@ class Main extends BaseClass {
   queue!: Bullet[]
   private ticker = new Ticker()
   private readonly runtime = new WeakMap<CommentData, CommentRuntime>()
+  private tickRequested = false
 
   /**
    * @param {import('./danmu').DanmuJs} danmu
@@ -243,6 +244,18 @@ class Main extends BaseClass {
     if (this._status === 'playing') {
       this._startTick()
     }
+  }
+
+  requestTick(): void {
+    if (this._status !== 'playing' || this.tickRequested) return
+    this.tickRequested = true
+    queueMicrotask(() => {
+      this.tickRequested = false
+      if (this._status === 'playing') {
+        this.readData()
+        this.dataHandle()
+      }
+    })
   }
 
   /**

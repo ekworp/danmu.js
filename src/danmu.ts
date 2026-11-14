@@ -439,6 +439,9 @@ export class DanmuJs extends BaseClass {
       }
 
       main.keepPoolWatermark()
+      if (!comment.realTime) {
+        main.requestTick()
+      }
     }
   }
 
