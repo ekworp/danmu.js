@@ -98,16 +98,16 @@ export class DanmuJs extends BaseClass {
       live: false,
       comments: [],
       direction: 'r2l' as const,
-      needResizeObserver: false,
+      needResizeObserver: true,
       dropStaleComments: true,
-      channelSize: undefined,
+      channelSize: 20,
       maxCommentsLength: undefined,
-      maxVisibleBullets: 200,
+      maxVisibleBullets: Infinity,
       bulletOffset: undefined,
       interval: 2000,
       highScorePriority: true, // 高积分优先展示
       chaseEffect: true, // 滚动弹幕追逐效果
-      responsiveFontSize: false, // 根据容器主方向尺寸连续缩放普通弹幕字体
+      responsiveFontSize: true, // 根据容器主方向尺寸连续缩放普通弹幕字体
       syncPlaybackRate: false,
       defaultOff: true
     })

@@ -3,6 +3,8 @@
   contain: layout paint;
   user-select: none;
   -ms-user-select: none;
+  color: #000;
+  font-size: 16px;
   > * {
     position: absolute;
     white-space: nowrap;
