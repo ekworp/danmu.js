@@ -199,6 +199,34 @@ export function styleCSSText(elem: HTMLElement, value: string): void {
   } catch (error) {}
 }
 
+const pendingTransformFrames = new WeakMap<HTMLElement, number>()
+
+export function cancelTransformAnimation(elem: HTMLElement): void {
+  const pendingFrame = pendingTransformFrames.get(elem)
+  if (pendingFrame !== undefined) {
+    cancelAnimationFrame(pendingFrame)
+    pendingTransformFrames.delete(elem)
+  }
+}
+
+export function animateTransform(
+  elem: HTMLElement,
+  transform: string,
+  duration: number
+): void {
+  cancelTransformAnimation(elem)
+
+  styleUtil(elem, 'transition', 'none')
+  void elem.offsetWidth
+
+  const frame = requestAnimationFrame(() => {
+    pendingTransformFrames.delete(elem)
+    styleUtil(elem, 'transition', `transform ${duration}s linear 0s`)
+    styleUtil(elem, 'transform', transform)
+  })
+  pendingTransformFrames.set(elem, frame)
+}
+
 export function isNumber(val: unknown): val is number {
   return typeof val === 'number' && !Number.isNaN(val)
 }

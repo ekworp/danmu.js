@@ -3,6 +3,8 @@ import BaseClass from './baseClass'
 import type { DanmuJs } from './danmu'
 import Log from './utils/logger'
 import {
+  animateTransform,
+  cancelTransformAnimation,
   copyDom,
   isFunction,
   isNumber,
@@ -115,6 +117,33 @@ export class Bullet extends BaseClass {
       }
     }
     return flag
+  }
+
+  getMotionPosition(containerPos: DOMRect): {
+    right: number
+    bottom: number
+  } {
+    if (this.status === 'start' && this._lastMoveTime && this.moveV) {
+      const elapsed = (Date.now() - this._lastMoveTime) / 1000
+      const distance = elapsed * this.moveV
+
+      if (this.direction === 'b2t') {
+        return {
+          right: containerPos.right,
+          bottom: containerPos.top + this.moveMoreS + this.height - distance
+        }
+      }
+
+      return {
+        right: containerPos.left + this.moveMoreS + this.width - distance,
+        bottom: containerPos.bottom
+      }
+    }
+
+    return {
+      right: this.elPos?.right ?? containerPos.left,
+      bottom: this.elPos?.bottom ?? containerPos.top
+    }
   }
 
   /**
@@ -333,6 +362,7 @@ export class Bullet extends BaseClass {
     if (!this.el) {
       return
     }
+    cancelTransformAnimation(this.el)
     if (this.mode === 'scroll') {
       const ctPos = this.danmu.containerPos
       if (isFullscreen) {
@@ -419,11 +449,10 @@ export class Bullet extends BaseClass {
         fullyMovedToScreenDistance = bulletPos.bottom - ctPos.bottom
 
         const leftDuration = (bulletPos.bottom - ctPos.top) / this.moveV
-        styleUtil(this.el, 'transition', `transform ${leftDuration}s linear 0s`)
-        styleUtil(
+        animateTransform(
           this.el,
-          'transform',
-          `translateX(-${this.top}px) translateY(-${this.height}px) translateZ(0px) rotate(90deg)`
+          `translateX(-${this.top}px) translateY(-${this.height}px) translateZ(0px) rotate(90deg)`,
+          leftDuration
         )
         this._lastMoveTime = Date.now()
         this.moveMoreS = bulletPos.top - ctPos.top
@@ -434,15 +463,10 @@ export class Bullet extends BaseClass {
         const leftDuration = leftDistance / this.moveV
 
         if (bulletPos.right > ctPos.left) {
-          styleUtil(
+          animateTransform(
             this.el,
-            'transition',
-            `transform ${leftDuration}s linear 0s`
-          )
-          styleUtil(
-            this.el,
-            'transform',
-            `translateX(-${leftDistance}px) translateY(0px) translateZ(0px)`
+            `translateX(-${leftDistance}px) translateY(0px) translateZ(0px)`,
+            leftDuration
           )
 
           this._lastMoveTime = Date.now()

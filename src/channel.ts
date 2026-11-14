@@ -12,6 +12,7 @@ interface ChannelState {
   queue: Record<ChannelMode, Bullet[]>
   operating: Record<ChannelMode, boolean>
   bookId: Record<string, number>
+  availableAt: number
 }
 
 interface ChannelLayout {
@@ -72,9 +73,14 @@ class Channel extends BaseClass {
     let flag = false
 
     if (mode === 'scroll') {
+      const now = Date.now()
       for (let i = 0, channel; i < channels.length; i++) {
         channel = channels[i]
         flag = true
+        if (channel.availableAt > now) {
+          flag = false
+          continue
+        }
         if (channel.operating[mode]) {
           flag = false
           continue
@@ -272,7 +278,9 @@ class Channel extends BaseClass {
             const curBullet = channel.queue.scroll[0]
 
             if (curBullet) {
-              const curBulletPos = curBullet.el.getBoundingClientRect()
+              const curBulletPos = curBullet.getMotionPosition(
+                this.containerPos
+              )
 
               // 1. 检测最后入轨弹幕是否已经完全飘入容器区域
               if (this.direction === 'b2t') {
@@ -675,7 +683,8 @@ class Channel extends BaseClass {
           top: false,
           bottom: false
         },
-        bookId: {}
+        bookId: {},
+        availableAt: 0
       }
     }
 
@@ -707,7 +716,8 @@ class Channel extends BaseClass {
           top: false,
           bottom: false
         },
-        bookId: {}
+        bookId: {},
+        availableAt: 0
       }
     }
 
