@@ -41,7 +41,6 @@
         top: 400px;
       }
     </style>
-    <script src="../browser/index.js" charset="utf-8"></script>
   </head>
   <body>
     <div id="wrap">
@@ -92,7 +91,9 @@
       <button onclick="sendPriorComment()">发送弹幕</button>
     </div>
     
-    <script type="text/javascript">
+    <script type="module">
+      import DanmuJs from '../browser/index.mjs'
+
       let wrap = document.getElementById('wrap')
       let player = document.getElementById('mse')
       let direction = 'r2l'
@@ -100,7 +101,7 @@
       let like = document.createElement('span')
       like.innerText = '10w+'
 
-      let danmu = new window.DanmuJs({
+      let danmu = new DanmuJs({
         needResizeObserver: true,
         channelSize: 24,
         container: document.getElementById('vs'),
@@ -365,6 +366,28 @@
         })
         return dom
       }
+
+      Object.assign(window, {
+        start,
+        stop,
+        pause,
+        play,
+        sendComment,
+        sendPriorComment,
+        setOpacity,
+        setFontSize,
+        setAllDuration,
+        setArea,
+        setAreaLines,
+        setCommentLike,
+        setCommentDuration,
+        hide,
+        show,
+        setCommentID,
+        toggleFullscreen,
+        toggleDirection,
+        toggleArea
+      })
     </script>
   </body>
 </html>

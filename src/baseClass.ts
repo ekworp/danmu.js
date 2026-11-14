@@ -1,3 +1,4 @@
+import type { Bullet } from './bullet'
 import Log from './utils/logger'
 
 export type CommentMode = 'scroll' | 'top' | 'bottom'
@@ -93,8 +94,8 @@ export interface DanmuEventMap {
   ready: undefined
   error: string
   destroy: undefined
-  bullet_remove: { bullet: unknown }
-  bullet_hover: { bullet: unknown; event: MouseEvent }
+  bullet_remove: { bullet: Bullet }
+  bullet_hover: { bullet: Bullet; event: MouseEvent }
   channel_resize: undefined
   changeDirection: DanmuConfig['direction']
 }
@@ -109,11 +110,12 @@ export interface PlayerAdapter {
   removeEventListener?: (event: string, handler: EventListener) => void
 }
 
-/* Internal classes deliberately expose dynamic state while they are being
- * migrated away from the legacy JavaScript implementation. */
 class BaseClass {
+  // Temporary compatibility boundary for legacy runtime fields. Core public
+  // APIs are explicitly typed; this can be removed after the internal classes
+  // are split into state objects.
   [key: string]: any
-  logger!: Log
+  protected logger!: Log
 
   setLogger(logger: string | Log) {
     this.logger =

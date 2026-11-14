@@ -24,6 +24,19 @@ export default defineConfig({
           js: 'index.cjs'
         }
       }
+    },
+    {
+      format: 'esm',
+      bundle: true,
+      syntax: 'es2020',
+      output: {
+        target: 'web',
+        distPath: './browser',
+        autoExternal: false,
+        filename: {
+          js: 'index.mjs'
+        }
+      }
     }
   ],
   define: {

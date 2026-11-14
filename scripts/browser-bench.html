@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="data:," />
+    <style>
+      #danmu-container {
+        position: relative;
+        width: 1280px;
+        height: 360px;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="danmu-container"></div>
+    <script type="module">
+      window.__VERSION__ = 'browser-bench'
+      const { default: DanmuJs } = await import('/browser/index.mjs')
+      window.DanmuJs = DanmuJs
+      window.__danmuBenchReady = true
+    </script>
+  </body>
+</html>

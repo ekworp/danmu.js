@@ -11,13 +11,15 @@
       "require": "./dist/index.cjs",
       "import": "./dist/index.mjs",
       "default": "./dist/index.mjs"
-    }
+    },
+    "./browser": "./browser/index.mjs"
   },
   "sideEffects": [
     "**/*.scss"
   ],
   "files": [
-    "dist"
+    "dist",
+    "browser"
   ],
   "scripts": {
     "prepare": "pnpm run build",
@@ -33,6 +35,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "bench": "node scripts/bench.mjs",
+    "bench:browser": "pnpm run build && node scripts/browser-bench.mjs",
     "release": "pnpm run check && pnpm run typecheck && pnpm run test && pnpm run build && pnpm publish",
     "release:rc": "pnpm run release -- --tag rc"
   },
@@ -52,6 +55,7 @@
     "@biomejs/biome": "^2.6.7",
     "@rslib/core": "^1.0.6",
     "css-loader": "^7.1.5",
+    "playwright": "^1.65.0",
     "sass": "^1.108.2",
     "sass-loader": "^17.1.0",
     "serve": "^14.2.7",

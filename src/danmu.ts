@@ -16,6 +16,8 @@ import RecyclableDomList from './domRecycle'
 import { addObserver, unObserver } from './resizeObserver'
 import { addClass, deepCopy, isNumber, styleUtil } from './utils/util'
 
+const VERSION = typeof __VERSION__ === 'string' ? __VERSION__ : 'development'
+
 /**
  * @typedef {import('./baseClass').CommentData} CommentData
  */
@@ -36,13 +38,17 @@ export class DanmuJs extends BaseClass {
     event: K,
     handler: DanmuEventHandler<DanmuEventMap[K]>
   ) => this
+  declare emit: <K extends DanmuEventName>(
+    event: K,
+    ...args: DanmuEventMap[K] extends undefined ? [] : [data: DanmuEventMap[K]]
+  ) => boolean
 
   constructor(options: DanmuConfigOptions = {}) {
     super()
 
     // logger
     this.setLogger('danmu')
-    this.logger && this.logger.info(`danmu.js version: ${__VERSION__}`)
+    this.logger && this.logger.info(`danmu.js version: ${VERSION}`)
 
     // configure
     const config: DanmuConfig = (this.config = {
