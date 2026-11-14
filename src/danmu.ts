@@ -151,6 +151,16 @@ export class DanmuJs extends BaseClass {
     this._bindPlayerEvents()
     this.direction = config.direction
     this._responsiveFontSizeBase = this._getResponsiveSize()
+    const containerFontSize =
+      typeof getComputedStyle === 'function'
+        ? Number.parseFloat(getComputedStyle(this.container).fontSize)
+        : 16
+    this._responsiveChannelSizeBase =
+      config.channelSize ||
+      Math.max(
+        12,
+        (Number.isFinite(containerFontSize) ? containerFontSize : 16) + 4
+      )
     this.bulletBtn = new Control(this)
     this.main = this.bulletBtn.main
     this.isReady = true
@@ -236,6 +246,26 @@ export class DanmuJs extends BaseClass {
     const min = Number.isFinite(options.min) ? options.min : 0
     const max = Number.isFinite(options.max) ? options.max : Infinity
     const scale = currentSize / this._responsiveFontSizeBase
+    const baseFontSize =
+      typeof getComputedStyle === 'function'
+        ? Number.parseFloat(getComputedStyle(this.container).fontSize)
+        : 16
+    const responsiveBaseFontSize = Number.isFinite(baseFontSize)
+      ? baseFontSize
+      : 16
+    const scaledBaseFontSize = Math.min(
+      max,
+      Math.max(min, responsiveBaseFontSize * scale)
+    )
+    const channelSize = Math.max(
+      12,
+      Math.round(
+        this._responsiveChannelSizeBase *
+          (scaledBaseFontSize / responsiveBaseFontSize)
+      )
+    )
+    this.config.channelSize = channelSize
+
     const resizeItem = (item: CommentData, el?: HTMLElement) => {
       if (item.mode === 'top' || item.mode === 'bottom') return
 
