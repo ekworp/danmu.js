@@ -51,26 +51,47 @@ try {
         player: { currentTime: 0 }
       })
 
+      const longTasks = []
+      const observer =
+        typeof PerformanceObserver === 'function'
+          ? new PerformanceObserver((list) => {
+              longTasks.push(
+                ...list.getEntries().map((entry) => entry.duration)
+              )
+            })
+          : null
+      observer?.observe({ type: 'longtask', buffered: true })
+
       await new Promise(requestAnimationFrame)
       const start = performance.now()
       danmu.start()
       await new Promise(requestAnimationFrame)
       const elapsed = performance.now() - start
       const bulletCount = container.children.length
+      observer?.disconnect()
       danmu.destroy()
       container.remove()
 
-      return { count, elapsed, bulletCount, remainingNodes: container.children.length }
+      return {
+        count,
+        elapsed,
+        bulletCount,
+        longTaskCount: longTasks.length,
+        longestTask: Math.max(0, ...longTasks),
+        remainingNodes: container.children.length
+      }
     }
 
     return Promise.all([run(100), run(1000), run(5000)])
   })
 
   console.table(
-    result.map(({ count, elapsed, bulletCount, remainingNodes }) => ({
+    result.map(({ count, elapsed, bulletCount, longTaskCount, longestTask, remainingNodes }) => ({
       comments: count,
       'start + layout (ms)': elapsed.toFixed(2),
       'rendered bullets': bulletCount,
+      'long tasks': longTaskCount,
+      'longest task (ms)': longestTask.toFixed(2),
       'nodes after destroy': remainingNodes
     }))
   )

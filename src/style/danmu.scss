@@ -1,5 +1,6 @@
 .danmu {
   overflow: hidden;
+  contain: layout paint;
   user-select: none;
   -ms-user-select: none;
   > * {

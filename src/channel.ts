@@ -141,7 +141,7 @@ class Channel extends BaseClass {
     }
     if (bulletBtn && bulletBtn.main && bulletBtn.main.data) {
       bulletBtn.main.data.forEach((item: CommentData) => {
-        item.attached_ = false
+        this.danmu.main?.setCommentAttached(item, false)
       })
     }
 

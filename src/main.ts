@@ -1,9 +1,10 @@
-import type { CommentData } from './baseClass'
+import type { CommentData, CommentRuntime } from './baseClass'
 import BaseClass from './baseClass'
 import Bullet from './bullet'
 import Channel from './channel'
 import { Ticker } from './core/ticker'
 import type { DanmuJs } from './danmu'
+import { getPlayerCurrentTime } from './player'
 import { hasOwnProperty } from './utils/util'
 
 // 单次尝试入轨弹幕数量越多，长任务及CPU耗时越多
@@ -37,6 +38,7 @@ class Main extends BaseClass {
   playedData!: CommentData[]
   queue!: Bullet[]
   private ticker = new Ticker()
+  private readonly runtime = new WeakMap<CommentData, CommentRuntime>()
 
   /**
    * @param {import('./danmu').DanmuJs} danmu
@@ -87,6 +89,21 @@ class Main extends BaseClass {
     return this._status
   }
 
+  getCommentRuntime(comment: CommentData): CommentRuntime {
+    let runtime = this.runtime.get(comment)
+    if (!runtime) {
+      runtime = { attached: false, status: 'pending' }
+      this.runtime.set(comment, runtime)
+    }
+    return runtime
+  }
+
+  setCommentAttached(comment: CommentData, attached: boolean): void {
+    const runtime = this.getCommentRuntime(comment)
+    runtime.attached = attached
+    runtime.status = attached ? 'playing' : 'pending'
+  }
+
   destroy() {
     this.logger && this.logger.info('destroy')
     this._unbindEvents()
@@ -123,7 +140,7 @@ class Main extends BaseClass {
       })
       data.some((item) => {
         if (item.id === bullet.id) {
-          item.attached_ = false
+          this.setCommentAttached(item, false)
           return true
         } else {
           return false
@@ -211,6 +228,21 @@ class Main extends BaseClass {
    */
   _cancelTick() {
     this.ticker.stop()
+  }
+
+  syncToTime(): void {
+    for (const bullet of [...this.queue]) {
+      bullet.remove()
+    }
+    this.queue = []
+    this.data.forEach((comment) => {
+      this.setCommentAttached(comment, false)
+    })
+    this.playedData = []
+    this.channel.reset()
+    if (this._status === 'playing') {
+      this._startTick()
+    }
   }
 
   /**
@@ -346,9 +378,7 @@ class Main extends BaseClass {
     if (!danmu.isReady || !danmu.main) return
 
     if (player) {
-      const currentTime = player.currentTime
-        ? Math.floor(player.currentTime * 1000)
-        : 0
+      const currentTime = Math.floor(getPlayerCurrentTime(player) * 1000)
 
       list = this.data.filter((item) => {
         if (!item.start && danmu.hideArr.indexOf(item.mode) < 0) {
@@ -357,7 +387,7 @@ class Main extends BaseClass {
           }
         }
         return (
-          !item.attached_ &&
+          !this.getCommentRuntime(item).attached &&
           danmu.hideArr.indexOf(item.mode) < 0 &&
           (!item.color || danmu.hideArr.indexOf('color') < 0) &&
           item.start - interval <= currentTime &&
@@ -382,13 +412,19 @@ class Main extends BaseClass {
       if (list.length === 0) list = this.playedData.splice(0, 1)
     }
 
-    if (list.length > 0 && channel.checkAvailableTrack(list[0].mode)) {
+    const maxVisible = this.danmu.config.maxVisibleBullets
+    const maxPerTick = this.danmu.config.maxBulletsPerTick
+    if (
+      list.length > 0 &&
+      this.queue.length < maxVisible &&
+      channel.checkAvailableTrack(list[0].mode)
+    ) {
       // 提前更新轨道位置信息, 减少Bullet频繁读取容器dom信息
       channel.updatePos()
 
       let tryCount = MAX_TRY_COUNT
 
-      for (let i = 0, item; i < list.length; i++) {
+      for (let i = 0, item; i < Math.min(list.length, maxPerTick); i++) {
         item = list[i]
         if (this.forceDuration && this.forceDuration !== item.duration) {
           item.duration = this.forceDuration
@@ -396,7 +432,7 @@ class Main extends BaseClass {
         bullet = new Bullet(danmu, item)
         if (!bullet.bulletCreateFail) {
           bullet.attach()
-          item.attached_ = true
+          this.setCommentAttached(item, true)
           result = channel.addBullet(bullet)
 
           if (result.result) {
@@ -412,7 +448,7 @@ class Main extends BaseClass {
               }
             }
             bullet = null
-            item.attached_ = false
+            this.setCommentAttached(item, false)
             if (item.noDiscard) {
               if (item.prior) {
                 this.data.unshift(item)
@@ -476,18 +512,18 @@ class Main extends BaseClass {
 
       for (let i = 0, comment; i < deleteCount; i++) {
         comment = data[i]
-        if (comment.prior && !comment.attached_) {
+        if (comment.prior && !this.getCommentRuntime(comment).attached) {
           priorComments.push(data[i])
         }
       }
-    } else if (config.dropStaleComments && player && player.currentTime) {
-      const currentTime = Math.floor(player.currentTime * 1000),
+    } else if (config.dropStaleComments && player) {
+      const currentTime = Math.floor(getPlayerCurrentTime(player) * 1000),
         timePoint = currentTime - config.interval
 
       if (timePoint > 0) {
         for (let i = 0, comment; i < data.length; i++) {
           comment = data[i]
-          if (comment.prior && !comment.attached_) {
+          if (comment.prior && !this.getCommentRuntime(comment).attached) {
             priorComments.push(data[i])
           }
 

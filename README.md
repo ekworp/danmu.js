@@ -68,16 +68,19 @@
       end: 1, //区域底部到播放器顶部所占播放器高度的比例
       lines: undefined // 弹幕虚拟轨道显示行数。当指定行数时，显示范围 start/end 不生效；当弹幕字体大小超过所需要的总虚拟轨道数时，弹幕也不会出现在轨道上，因此请设置好弹幕fontSize及影响弹幕高度的其他样式，让弹幕和轨道高度匹配
     },
-    channelSize: 40, // 轨道大小
+     channelSize: 40, // 轨道大小，responsiveFontSize 开启时会同步缩放
     mouseControl: true, // 打开鼠标控制, 打开后可监听到 bullet_hover 事件。danmu.on('bullet_hover', function (data) {})
     mouseControlPause: false, // 鼠标触摸暂停。mouseControl: true 生效
     //bOffset: 1000, // 可调节弹幕横向间隔（毫秒）
-     defaultOff: true, // 开启此项后弹幕不会初始化，默认初始化弹幕
+      defaultOff: true, // 初始化时不启动；播放器开始播放后自动启动
+      dropStaleComments: true, // 丢弃视频当前时间之前的过期弹幕
+      maxBulletsPerTick: 8, // 单次调度最多创建的弹幕数量
+      maxVisibleBullets: 200, // 同时存在的最大弹幕数量
      chaseEffect: true, // 开启滚动弹幕追逐效果, 默认为true
      responsiveFontSize: {
        min: 12, // 可选，字体最小值(px)
        max: 36 // 可选，字体最大值(px)
-     } // 根据容器主方向尺寸连续缩放普通弹幕字体
+     } // 根据容器主方向尺寸连续缩放普通弹幕字体和轨道间距
    })
   ```
 

@@ -28,7 +28,6 @@ export interface CommentData {
   el?: HTMLElement | (() => HTMLElement)
   elLazyInit?: boolean
   mode: CommentMode
-  attached_?: boolean
   realTime?: boolean
   color?: string
   bookChannelId?: [number, number]
@@ -39,6 +38,13 @@ export interface CommentData {
   eventListeners?: CommentEventListener[]
   like?: LikeData
   responsiveFontSize_?: number
+}
+
+export interface CommentRuntime {
+  attached: boolean
+  status: 'pending' | 'playing' | 'finished'
+  element?: HTMLElement
+  channel?: [number, number]
 }
 
 export interface GlobalHooks {
@@ -66,6 +72,8 @@ export interface DanmuConfig {
   dropStaleComments: boolean
   channelSize?: number
   maxCommentsLength?: number
+  maxBulletsPerTick: number
+  maxVisibleBullets: number
   bulletOffset?: number
   interval: number
   highScorePriority: boolean
@@ -106,9 +114,13 @@ export type DanmuEventName = keyof DanmuEventMap
 export type DanmuEventHandler<T> = (data: T) => void
 
 export interface PlayerAdapter {
-  currentTime?: number
+  currentTime?: number | (() => number)
+  playbackRate?: number | (() => number)
+  paused?: boolean | (() => boolean)
   addEventListener?: (event: string, handler: EventListener) => void
   removeEventListener?: (event: string, handler: EventListener) => void
+  on?: (event: string, handler: (...args: never[]) => void) => void
+  off?: (event: string, handler: (...args: never[]) => void) => void
 }
 
 class BaseClass {

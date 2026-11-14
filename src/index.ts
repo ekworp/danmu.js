@@ -14,6 +14,7 @@ if (
 export type {
   CommentData,
   CommentMode,
+  CommentRuntime,
   DanmuConfig,
   DanmuConfigOptions,
   DanmuEventHandler,

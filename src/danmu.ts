@@ -12,6 +12,11 @@ import BaseClass from './baseClass'
 import type Bullet from './bullet'
 import Control from './control'
 import RecyclableDomList from './domRecycle'
+import {
+  addPlayerListener,
+  getPlayerPlaybackRate,
+  removePlayerListener
+} from './player'
 import { addObserver, unObserver } from './resizeObserver'
 import { addClass, deepCopy, isNumber, styleUtil } from './utils/util'
 
@@ -97,6 +102,8 @@ export class DanmuJs extends BaseClass {
       dropStaleComments: true,
       channelSize: undefined,
       maxCommentsLength: undefined,
+      maxBulletsPerTick: 8,
+      maxVisibleBullets: 200,
       bulletOffset: undefined,
       interval: 2000,
       highScorePriority: true, // 高积分优先展示
@@ -287,7 +294,7 @@ export class DanmuJs extends BaseClass {
   _bindPlayerEvents() {
     const { player } = this
 
-    if (!player || typeof player.addEventListener !== 'function') {
+    if (!player) {
       return
     }
 
@@ -311,24 +318,36 @@ export class DanmuJs extends BaseClass {
         this._playerWaiting = true
       }
     }
+    const onSeeking = () => {
+      if (this.main) {
+        this.main.syncToTime()
+      }
+    }
+    const onRateChange = () => {
+      if (!this.main) return
+      this.setPlayRate('scroll', getPlayerPlaybackRate(player))
+    }
 
     this._playerEvents = [
       ['waiting', onWaiting],
       ['playing', onPlaying],
-      ['pause', onPause]
+      ['pause', onPause],
+      ['seeking', onSeeking],
+      ['seeked', onSeeking],
+      ['ratechange', onRateChange]
     ]
     this._playerEvents.forEach(([event, handler]: [string, EventListener]) => {
-      player.addEventListener(event, handler)
+      addPlayerListener(player, event, handler)
     })
   }
 
   _unbindPlayerEvents() {
-    if (!this.player || typeof this.player.removeEventListener !== 'function') {
+    if (!this.player) {
       return
     }
 
     this._playerEvents.forEach(([event, handler]: [string, EventListener]) => {
-      this.player.removeEventListener(event, handler)
+      removePlayerListener(this.player, event, handler)
     })
     this._playerEvents = []
   }
