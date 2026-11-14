@@ -11,20 +11,13 @@
       "require": "./dist/index.cjs",
       "import": "./dist/index.mjs",
       "default": "./dist/index.mjs"
-    },
-    "./browser": "./browser/index.js"
+    }
   },
   "sideEffects": [
     "**/*.scss"
   ],
   "files": [
-    "dist",
-    "browser"
-  ],
-  "unpkg": "./browser/index.js",
-  "unpkgFiles": [
-    "dist",
-    "browser"
+    "dist"
   ],
   "scripts": {
     "prepare": "pnpm run build",

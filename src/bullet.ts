@@ -1,4 +1,6 @@
+import type { CommentData, CommentEventListener, StyleMap } from './baseClass'
 import BaseClass from './baseClass'
+import type { DanmuJs } from './danmu'
 import Log from './utils/logger'
 import {
   copyDom,
@@ -22,7 +24,7 @@ export class Bullet extends BaseClass {
    * @param {import('./danmu').DanmuJs} danmu
    * @param {import('./baseClass').CommentData} options
    */
-  constructor(danmu: any, options: any = {}) {
+  constructor(danmu: DanmuJs, options: CommentData = {} as CommentData) {
     super()
     const { container, recycler, config } = danmu
 
@@ -163,13 +165,15 @@ export class Bullet extends BaseClass {
               options.eventListeners &&
               options.eventListeners.length > 0
             ) {
-              options.eventListeners.forEach((eventListener: any) => {
-                copyDOM.addEventListener(
-                  eventListener.event,
-                  eventListener.listener,
-                  eventListener.useCapture || false
-                )
-              })
+              options.eventListeners.forEach(
+                (eventListener: CommentEventListener) => {
+                  copyDOM.addEventListener(
+                    eventListener.event,
+                    eventListener.listener,
+                    eventListener.useCapture || false
+                  )
+                }
+              )
             }
             el = this.recycler.use()
             if (el.childNodes.length > 0) {
@@ -491,7 +495,7 @@ export class Bullet extends BaseClass {
       this.el.style.fontSize = size
     }
   }
-  setLikeDom(el: HTMLElement, style: Record<string, string | number> = {}) {
+  setLikeDom(el: HTMLElement, style: StyleMap = {}) {
     if (el) {
       Object.keys(style).forEach((key) => {
         styleUtil(el, key, style[key])

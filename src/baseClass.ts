@@ -2,6 +2,21 @@ import Log from './utils/logger'
 
 export type CommentMode = 'scroll' | 'top' | 'bottom'
 
+export type StyleValue = string | number | undefined
+
+export type StyleMap = Record<string, StyleValue>
+
+export interface LikeData {
+  el: HTMLElement
+  style?: StyleMap
+}
+
+export interface CommentEventListener {
+  event: string
+  listener: EventListener
+  useCapture?: boolean
+}
+
 export interface CommentData {
   id?: string
   start: number
@@ -17,14 +32,12 @@ export interface CommentData {
   color?: string
   bookChannelId?: [number, number]
   disableCopyDOM?: boolean
+  noDiscard?: boolean
   moveV?: number
-  style?: Record<string, string | number | undefined>
-  eventListeners?: Array<[string, EventListener]>
-  like?: {
-    el: HTMLElement
-    style?: Record<string, string | number>
-  }
-  [key: string]: any
+  style?: StyleMap
+  eventListeners?: CommentEventListener[]
+  like?: LikeData
+  responsiveFontSize_?: number
 }
 
 export interface GlobalHooks {
@@ -58,13 +71,32 @@ export interface DanmuConfig {
   chaseEffect: boolean
   responsiveFontSize: boolean | { min?: number; max?: number }
   container?: HTMLElement
-  containerStyle?: Record<string, string>
+  containerStyle?: StyleMap
+  player?: PlayerAdapter
+  mouseControl?: boolean
+  mouseControlPause?: boolean
+  mouseEnterControl?: boolean
+  defaultOff?: boolean
+  disableCopyDOM?: boolean
+  bOffset?: number
+}
+
+export type DanmuConfigOptions = Partial<DanmuConfig>
+
+export interface PlayerAdapter {
+  currentTime?: number
+  addEventListener?: (event: string, handler: EventListener) => void
+  removeEventListener?: (event: string, handler: EventListener) => void
+}
+
+/* Internal classes deliberately expose dynamic state while they are being
+ * migrated away from the legacy JavaScript implementation. */
+export interface RuntimeConfig extends DanmuConfig {
   player?: {
     currentTime?: number
     addEventListener?: (event: string, handler: EventListener) => void
     removeEventListener?: (event: string, handler: EventListener) => void
   }
-  [key: string]: any
 }
 
 class BaseClass {

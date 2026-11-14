@@ -81,7 +81,18 @@
    })
   ```
 
-这是 danmu.js 的 npm 使用方法，cdn 使用可以参考示例。[DEMO](https://github.com/bytedance/danmu.js/tree/master/demo/index.html)
+这是 danmu.js 的 npm 使用方法，示例可以参考 [DEMO](https://github.com/bytedance/danmu.js/tree/master/demo/index.html)。
+
+当前 npm 包提供 ESM 和 CommonJS 两种模块格式，并附带完整 TypeScript 声明：
+
+```ts
+import DanmuJs, {
+  type CommentData,
+  type DanmuConfigOptions
+} from 'danmu.js'
+```
+
+浏览器项目建议使用 ESM、由应用自己的构建工具处理依赖；项目不再发布 UMD/ES5 全局脚本版本。
 
 ### Properties
 

@@ -87,24 +87,28 @@ export function findDom(
   return dom
 }
 
-export function deepCopy(dst: Record<string, any>, src: Record<string, any>) {
-  if (typeOf(src) === 'Object' && typeOf(dst) === 'Object') {
-    Object.keys(src).forEach((key) => {
-      const isDomNode = typeof Node !== 'undefined' && src[key] instanceof Node
-      if (typeOf(src[key]) === 'Object' && !isDomNode) {
-        if (!dst[key]) {
-          dst[key] = src[key]
+export function deepCopy(dst: object, src: object): void {
+  const target = dst as Record<string, unknown>
+  const source = src as Record<string, unknown>
+  if (typeOf(source) === 'Object' && typeOf(target) === 'Object') {
+    Object.keys(source).forEach((key) => {
+      const isDomNode =
+        typeof Node !== 'undefined' && source[key] instanceof Node
+      if (typeOf(source[key]) === 'Object' && !isDomNode) {
+        if (!target[key]) {
+          target[key] = source[key]
         } else {
-          deepCopy(dst[key], src[key])
+          deepCopy(target[key] as object, source[key] as object)
         }
-      } else if (typeOf(src[key]) === 'Array') {
-        dst[key] =
-          typeOf(dst[key]) === 'Array' ? dst[key].concat(src[key]) : src[key]
+      } else if (typeOf(source[key]) === 'Array') {
+        target[key] =
+          typeOf(target[key]) === 'Array'
+            ? (target[key] as unknown[]).concat(source[key] as unknown[])
+            : source[key]
       } else {
-        dst[key] = src[key]
+        target[key] = source[key]
       }
     })
-    return dst
   }
 }
 
@@ -127,10 +131,18 @@ export function copyDom(dom: HTMLElement): HTMLElement | string {
   }
 }
 
+interface EventSource {
+  on(event: string, fn: EventHandler): void
+  once(event: string, fn: EventHandler): void
+  off(event: string, fn: EventHandler): void
+}
+
+type EventHandler = (data?: unknown) => void
+
 function offInDestroy(
-  object: any,
+  object: EventSource,
   event: string,
-  fn: (data?: any) => void,
+  fn: EventHandler,
   offEvent: string
 ) {
   function onDestroy() {
@@ -141,16 +153,16 @@ function offInDestroy(
 }
 
 export function attachEventListener(
-  object: any,
+  object: EventSource,
   event: string,
-  fn: (data?: any) => void,
+  fn: EventHandler,
   offEvent?: string
 ): void {
   if (offEvent) {
     object.on(event, fn)
     offInDestroy(object, event, fn, offEvent)
   } else {
-    const _fn = (data: any) => {
+    const _fn = (data?: unknown) => {
       fn(data)
       object.off(event, _fn)
     }
@@ -170,7 +182,7 @@ export function styleUtil(
 ): void {
   const style = elem.style
   try {
-    ;(style as any)[name] = value
+    Object.assign(style, { [name]: value })
   } catch (error) {
     style.setProperty(name, String(value))
   }
@@ -191,7 +203,7 @@ export function isNumber(val: unknown): val is number {
   return typeof val === 'number' && !Number.isNaN(val)
 }
 
-export function isFunction(val: unknown): val is (...args: any[]) => any {
+export function isFunction(val: unknown): val is (...args: never[]) => unknown {
   return typeof val === 'function'
 }
 
@@ -201,12 +213,12 @@ export function isFunction(val: unknown): val is (...args: any[]) => any {
  * @param {number} wait
  * @returns
  */
-export function throttle(
-  func: (...args: any[]) => void,
+export function throttle<Args extends unknown[]>(
+  func: (...args: Args) => void,
   wait: number
-): (...args: any[]) => void {
+): (...args: Args) => void {
   let timer = 0
-  return (...args) => {
+  return (...args: Args) => {
     clearTimeout(timer)
     timer = setTimeout(() => func.apply(undefined, args), wait)
   }

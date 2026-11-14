@@ -3,15 +3,16 @@ import { hasOwnProperty, styleUtil } from './utils/util'
 export default class RecyclableDOMList {
   [key: string]: any
 
-  constructor(options = {}) {
-    options = {
+  constructor(options: RecycleOptions = {}) {
+    const resolvedOptions: Required<RecycleOptions> = {
       initDOM: () => document.createElement('div'),
-      initSize: 10
+      initSize: 10,
+      ...options
     }
-    this.init(options)
+    this.init(resolvedOptions)
   }
 
-  init(options: any) {
+  init(options: Required<RecycleOptions>) {
     this.idleList = []
     this.usingList = []
     this._id = 0
@@ -73,4 +74,9 @@ export default class RecyclableDOMList {
       element.setAttribute('style', '')
     }
   }
+}
+
+interface RecycleOptions {
+  initDOM?: (id: number) => HTMLElement
+  initSize?: number
 }

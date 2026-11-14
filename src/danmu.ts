@@ -1,6 +1,13 @@
 import EventEmitter from 'event-emitter'
-import type { CommentData, DanmuConfig, GlobalHooks } from './baseClass'
+import type {
+  CommentData,
+  CommentMode,
+  DanmuConfig,
+  DanmuConfigOptions,
+  GlobalHooks
+} from './baseClass'
 import BaseClass from './baseClass'
+import type Bullet from './bullet'
 import Control from './control'
 import RecyclableDomList from './domRecycle'
 import { addObserver, unObserver } from './resizeObserver'
@@ -14,7 +21,7 @@ import { addClass, deepCopy, isNumber, styleUtil } from './utils/util'
  */
 
 export class DanmuJs extends BaseClass {
-  constructor(options: Partial<DanmuConfig> = {}) {
+  constructor(options: DanmuConfigOptions = {}) {
     super()
 
     // logger
@@ -62,7 +69,7 @@ export class DanmuJs extends BaseClass {
     // freezed comment
     this.freezeId = null
 
-    config.comments.forEach((comment: any) => {
+    config.comments.forEach((comment: CommentData) => {
       comment.duration = comment.duration ? comment.duration : 5000
       if (!comment.mode) {
         comment.mode = 'scroll'
@@ -83,7 +90,7 @@ export class DanmuJs extends BaseClass {
     if (config.containerStyle) {
       const style = config.containerStyle
       Object.keys(style).forEach((key) => {
-        this.container.style[key] = style[key]
+        styleUtil(this.container, key, style[key])
       })
     }
     addClass(this.container, 'danmu')
@@ -143,7 +150,7 @@ export class DanmuJs extends BaseClass {
     return this.direction === 'b2t' ? rect.height : rect.width
   }
 
-  _getResponsiveFontSize(item: any, el?: HTMLElement) {
+  _getResponsiveFontSize(item: CommentData, el?: HTMLElement) {
     if (item.responsiveFontSize_) {
       return item.responsiveFontSize_
     }
@@ -155,7 +162,7 @@ export class DanmuJs extends BaseClass {
     if (!fontSize && this.container && typeof getComputedStyle === 'function') {
       fontSize = getComputedStyle(this.container).fontSize
     }
-    const size = parseFloat(fontSize)
+    const size = parseFloat(String(fontSize))
     if (Number.isFinite(size) && size > 0) {
       item.responsiveFontSize_ = size
       return size
@@ -179,7 +186,7 @@ export class DanmuJs extends BaseClass {
     const min = Number.isFinite(options.min) ? options.min : 0
     const max = Number.isFinite(options.max) ? options.max : Infinity
     const scale = currentSize / this._responsiveFontSizeBase
-    const resizeItem = (item: any, el: any = undefined) => {
+    const resizeItem = (item: CommentData, el?: HTMLElement) => {
       if (item.mode === 'top' || item.mode === 'bottom') return
 
       const base = this._getResponsiveFontSize(item, el)
@@ -192,8 +199,8 @@ export class DanmuJs extends BaseClass {
       if (el) el.style.fontSize = fontSize
     }
 
-    this.main.data.forEach((item: any) => resizeItem(item))
-    this.main.queue.forEach((item: any) => resizeItem(item.options, item.el))
+    this.main.data.forEach((item: CommentData) => resizeItem(item))
+    this.main.queue.forEach((item: Bullet) => resizeItem(item.options, item.el))
   }
 
   _bindPlayerEvents() {
@@ -344,7 +351,7 @@ export class DanmuJs extends BaseClass {
           return false
         }
       })
-      this.main.queue.some((item: any) => {
+      this.main.queue.some((item: Bullet) => {
         if (item.id === oldID) {
           item.id = newID
           item.pauseMove()
@@ -371,7 +378,7 @@ export class DanmuJs extends BaseClass {
           return false
         }
       })
-      this.main.queue.some((item: any) => {
+      this.main.queue.some((item: Bullet) => {
         if (item.id === id) {
           item.duration = duration
           item.pauseMove()
@@ -395,7 +402,7 @@ export class DanmuJs extends BaseClass {
           return false
         }
       })
-      this.main.queue.some((item: any) => {
+      this.main.queue.some((item: Bullet) => {
         if (item.id === id) {
           item.pauseMove()
           item.setLikeDom(like.el, like.style)
@@ -423,7 +430,7 @@ export class DanmuJs extends BaseClass {
         return
       }
 
-      main.queue.some((item: any) => {
+      main.queue.some((item: Bullet) => {
         if (item.id === id) {
           if (main.status !== 'paused') {
             item.startMove(true)
@@ -462,7 +469,7 @@ export class DanmuJs extends BaseClass {
     if (id) {
       this._freezeCtrl(id)
 
-      this.main.queue.some((item: any) => {
+      this.main.queue.some((item: Bullet) => {
         if (item.id === id) {
           item.status = 'forcedPause'
           item.pauseMove()
@@ -486,7 +493,7 @@ export class DanmuJs extends BaseClass {
       this._releaseCtrl(id)
 
       // remove bullet from the queue list
-      main.queue = main.queue.filter((item: any) => {
+      main.queue = main.queue.filter((item: Bullet) => {
         if (item.id === id) {
           item.remove()
           return false
@@ -520,7 +527,7 @@ export class DanmuJs extends BaseClass {
    * 设置所有弹幕播放时长
    * @param {number} duration
    */
-  setAllDuration(mode: any = 'scroll', duration: number, force = true) {
+  setAllDuration(mode: CommentMode = 'scroll', duration: number, force = true) {
     this.logger &&
       this.logger.info(
         `setAllDuration: mode ${mode} duration ${duration} force ${force}`
@@ -535,7 +542,7 @@ export class DanmuJs extends BaseClass {
           data.duration = duration
         }
       })
-      this.main.queue.forEach((item: any) => {
+      this.main.queue.forEach((item: Bullet) => {
         if (mode === item.mode) {
           item.duration = duration
           item.pauseMove()
@@ -551,11 +558,11 @@ export class DanmuJs extends BaseClass {
    * 设置弹幕播放速率，在弹幕播放速度上乘以一个系数，控制速度的变化
    * @param {number} val
    */
-  setPlayRate(mode: any = 'scroll', val: number) {
+  setPlayRate(mode: CommentMode = 'scroll', val: number) {
     this.logger && this.logger.info(`setPlayRate: ${val}`)
     if (isNumber(val) && val > 0) {
       this.main.playRate = val
-      this.main.queue.forEach((item: any) => {
+      this.main.queue.forEach((item: Bullet) => {
         if (mode === item.mode) {
           item.pauseMove()
           if (this.main.status !== 'paused') {
@@ -590,7 +597,7 @@ export class DanmuJs extends BaseClass {
           data.style.fontSize = this.fontSize
         }
       })
-      this.main.queue.forEach((item: any) => {
+      this.main.queue.forEach((item: Bullet) => {
         if (!item.options.style) {
           item.options.style = {}
         }
@@ -627,9 +634,9 @@ export class DanmuJs extends BaseClass {
       this.hideArr.push(mode)
     }
     const arr = this.main.queue.filter(
-      (item: any) => mode === item.mode || (mode === 'color' && item.color)
+      (item: Bullet) => mode === item.mode || (mode === 'color' && item.color)
     )
-    arr.forEach((item: any) => item.remove())
+    arr.forEach((item: Bullet) => item.remove())
   }
 
   show(mode = 'scroll') {

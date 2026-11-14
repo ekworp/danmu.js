@@ -24,20 +24,6 @@ export default defineConfig({
           js: 'index.cjs'
         }
       }
-    },
-    {
-      format: 'umd',
-      umdName: 'DanmuJs',
-      bundle: true,
-      syntax: 'es5',
-      output: {
-        target: 'web',
-        distPath: './browser',
-        globalObject: 'globalThis',
-        filename: {
-          js: 'index.js'
-        }
-      }
     }
   ],
   define: {

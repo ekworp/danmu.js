@@ -6,13 +6,13 @@ declare module '*.scss' {
 }
 
 declare module 'event-emitter' {
-  type EventHandler = (...args: any[]) => void
+  type EventHandler = (...args: unknown[]) => void
 
   interface EventEmitterInstance {
     on(event: string, handler: EventHandler): this
     once(event: string, handler: EventHandler): this
     off(event: string, handler: EventHandler): this
-    emit(event: string, ...args: any[]): boolean
+    emit(event: string, ...args: unknown[]): boolean
   }
 
   function EventEmitter<T extends object>(target: T): T & EventEmitterInstance

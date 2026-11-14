@@ -1,7 +1,24 @@
+import type { CommentData, CommentMode } from './baseClass'
 import BaseClass from './baseClass'
+import type { Bullet } from './bullet'
 import type { DanmuJs } from './danmu'
 import { attachEventListener, hasOwnProperty, isNumber } from './utils/util'
 import { validAreaLineRule } from './utils/validator'
+
+type ChannelMode = CommentMode
+
+interface ChannelState {
+  id: number
+  queue: Record<ChannelMode, Bullet[]>
+  operating: Record<ChannelMode, boolean>
+  bookId: Record<string, number>
+}
+
+interface ChannelLayout {
+  channelSize: number
+  channelCount: number
+  channels: ChannelState[]
+}
 
 /**
  * @typedef {import('./bullet').Bullet} Bullet
@@ -29,8 +46,10 @@ class Channel extends BaseClass {
     attachEventListener(
       this.danmu,
       'bullet_remove',
-      (r) => {
-        this.removeBullet(r.bullet)
+      (r?: unknown) => {
+        if (r && typeof r === 'object' && 'bullet' in r) {
+          this.removeBullet(r.bullet as import('./bullet').Bullet)
+        }
       },
       'destroy'
     )
@@ -100,7 +119,7 @@ class Channel extends BaseClass {
 
     // bullet on waiting room
     if (bulletBtn && bulletBtn.main) {
-      bulletBtn.main.queue.forEach((item: any) => {
+      bulletBtn.main.queue.forEach((item: import('./bullet').Bullet) => {
         item.remove()
       })
     }
@@ -108,14 +127,14 @@ class Channel extends BaseClass {
     if (self.channels && self.channels.length > 0) {
       ;['scroll', 'top', 'bottom'].forEach((key) => {
         for (let i = 0; i < self.channels.length; i++) {
-          self.channels[i].queue[key].forEach((item: any) => {
+          self.channels[i].queue[key as ChannelMode].forEach((item: Bullet) => {
             item.remove()
           })
         }
       })
     }
     if (bulletBtn && bulletBtn.main && bulletBtn.main.data) {
-      bulletBtn.main.data.forEach((item: any) => {
+      bulletBtn.main.data.forEach((item: CommentData) => {
         item.attached_ = false
       })
     }
@@ -134,8 +153,9 @@ class Channel extends BaseClass {
         self.resetId = null
       }
 
-      const { channelSize, channelCount, channels } =
-        self._initChannels() as any
+      const layout = self._initChannels()
+      if (!layout) return
+      const { channelSize, channelCount, channels } = layout
 
       self.channelCount = channelCount
       self.channels = channels
@@ -179,7 +199,7 @@ class Channel extends BaseClass {
    *
    * @param {import('./bullet').Bullet} bullet
    */
-  addBullet(bullet: any) {
+  addBullet(bullet: Bullet) {
     const danmu = this.danmu
     const channels = this.channels
     let channelHeight, channelWidth, occupy
@@ -203,7 +223,7 @@ class Channel extends BaseClass {
       for (let i = 0, max = channels.length; i < max; i++) {
         if (
           channels[i].queue[bullet.mode].some(
-            (item: any) => item.id === bullet.id
+            (item: Bullet) => item.id === bullet.id
           )
         ) {
           return {
@@ -377,7 +397,7 @@ class Channel extends BaseClass {
           delete bullet.bookChannelId
           if (danmu.player) {
             const dataList = danmu.bulletBtn.main.data
-            dataList.some((item: any) => {
+            dataList.some((item: CommentData) => {
               if (item.id === bullet.id) {
                 delete item.bookChannelId
                 return true
@@ -536,7 +556,7 @@ class Channel extends BaseClass {
       }
     }
   }
-  removeBullet(bullet: any) {
+  removeBullet(bullet: Bullet) {
     this.logger &&
       this.logger.info(`removeBullet ${bullet.options.txt || '[DOM Element]'}`)
 
@@ -552,7 +572,7 @@ class Channel extends BaseClass {
       if (channel) {
         channel.operating[bullet.mode] = true
         let i = -1
-        channel.queue[bullet.mode].some((item: any, index: number) => {
+        channel.queue[bullet.mode].some((item: Bullet, index: number) => {
           if (item.id === bullet.id) {
             i = index
             return true
@@ -578,7 +598,7 @@ class Channel extends BaseClass {
   /**
    * @private
    */
-  _initChannels(): any {
+  _initChannels(): ChannelLayout | undefined {
     if (!this.danmu || !this.danmu.config) {
       return
     }
@@ -618,7 +638,7 @@ class Channel extends BaseClass {
       }
     }
 
-    const channels: any[] = []
+    const channels: ChannelState[] = []
     for (let i = 0; i < channelCount; i++) {
       channels[i] = {
         id: i,
@@ -651,7 +671,7 @@ class Channel extends BaseClass {
     }
     self.resizing = true
 
-    function setItem(channels: any[], i: number) {
+    function setItem(channels: ChannelState[], i: number) {
       channels[i] = {
         id: i,
         queue: {
@@ -668,19 +688,21 @@ class Channel extends BaseClass {
       }
     }
 
-    function updateChannelsLower(channels: any[], fontSize: number) {
+    function updateChannelsLower(channels: ChannelState[], fontSize: number) {
       function updateTopScrollQueue(i: number) {
         const items = ['scroll', 'top']
         items.forEach((key_) => {
-          self.channels[i].queue[key_].forEach((item: any) => {
-            if (item.el) {
-              channels[i].queue[key_].push(item)
+          self.channels[i].queue[key_ as ChannelMode].forEach(
+            (item: Bullet) => {
+              if (item.el) {
+                channels[i].queue[key_ as ChannelMode].push(item)
+              }
             }
-          })
+          )
         })
       }
       function updateBottomQueue(i: number) {
-        self.channels[i].queue.bottom.forEach((item: any) => {
+        self.channels[i].queue.bottom.forEach((item: Bullet) => {
           if (item.el) {
             channels[
               i + channels.length - self.channels.length
@@ -710,7 +732,7 @@ class Channel extends BaseClass {
       for (let i = 0; i < channels.length; i++) {
         const items = ['scroll', 'top', 'bottom']
         items.forEach((key) => {
-          channels[i].queue[key].forEach((item: any) => {
+          channels[i].queue[key as ChannelMode].forEach((item: Bullet) => {
             item.resized = false
           })
         })
@@ -723,7 +745,7 @@ class Channel extends BaseClass {
       }
     }
 
-    function updateChannelsGreater(channels: any[], fontSize: number) {
+    function updateChannelsGreater(channels: ChannelState[], fontSize: number) {
       const items = ['scroll', 'top', 'bottom']
 
       for (let i = 0; i < channels.length; i++) {
@@ -738,11 +760,11 @@ class Channel extends BaseClass {
             const num =
               key === 'bottom' ? i - channels.length + self.channels.length : i
             self.channels[num].queue[key].forEach(
-              (item: any, index: number) => {
+              (item: Bullet, index: number) => {
                 if (!item.el) {
                   return
                 }
-                channels[i].queue[key].push(item)
+                channels[i].queue[key as ChannelMode].push(item)
                 if (key === 'bottom') {
                   if (item.channel_id[0] + item.channel_id[1] - 1 === num) {
                     const channel_id = [].concat(item.channel_id)
@@ -769,7 +791,7 @@ class Channel extends BaseClass {
       }
       for (let i = 0; i < channels.length; i++) {
         items.forEach((key) => {
-          channels[i].queue[key].forEach((item: any) => {
+          channels[i].queue[key as ChannelMode].forEach((item: Bullet) => {
             item.resized = false
           })
         })
@@ -791,7 +813,7 @@ class Channel extends BaseClass {
       self._cancelResizeTimer()
 
       if (bulletBtn.main.data) {
-        bulletBtn.main.data.forEach((item: any) => {
+        bulletBtn.main.data.forEach((item: CommentData) => {
           if (item.bookChannelId) {
             delete item.bookChannelId
             self.logger &&
@@ -803,7 +825,12 @@ class Channel extends BaseClass {
       self.width = self.containerWidth
       self.height = self.containerHeight
 
-      const { channelSize, channels } = self._initChannels()
+      const layout = self._initChannels()
+      if (!layout) {
+        self.resizing = false
+        return
+      }
+      const { channelSize, channels } = layout
 
       if (self.channels) {
         if (self.channels.length <= channels.length) {

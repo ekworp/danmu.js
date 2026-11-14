@@ -1,7 +1,6 @@
-import { throttle } from './utils/util'
-
 class ResizeObserverWrapper {
   private observer: ResizeObserver | null = null
+  private frame: number | null = null
   private __handlers: Array<{
     target: Element
     handler: Array<() => void>
@@ -13,11 +12,13 @@ class ResizeObserverWrapper {
       return
     }
     try {
-      this.observer = new ResizeObserver(
-        throttle((entries: ResizeObserverEntry[]) => {
+      this.observer = new ResizeObserver((entries: ResizeObserverEntry[]) => {
+        if (this.frame !== null) return
+        this.frame = requestAnimationFrame(() => {
+          this.frame = null
           this.__trigger(entries)
-        }, 100)
-      )
+        })
+      })
     } catch (err) {}
   }
 
@@ -58,6 +59,10 @@ class ResizeObserverWrapper {
   }
 
   destroyObserver(_target?: Element, _handler?: () => void): void {
+    if (this.frame !== null) {
+      cancelAnimationFrame(this.frame)
+      this.frame = null
+    }
     this.observer && this.observer.disconnect()
     this.observer = null
     this.__handlers = []

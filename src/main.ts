@@ -2,6 +2,7 @@ import type { CommentData } from './baseClass'
 import BaseClass from './baseClass'
 import Bullet from './bullet'
 import Channel from './channel'
+import { Ticker } from './core/ticker'
 import type { DanmuJs } from './danmu'
 import { hasOwnProperty } from './utils/util'
 
@@ -20,6 +21,7 @@ class Main extends BaseClass {
   data!: CommentData[]
   playedData!: CommentData[]
   queue!: Bullet[]
+  private ticker = new Ticker()
 
   /**
    * @param {import('./danmu').DanmuJs} danmu
@@ -183,36 +185,25 @@ class Main extends BaseClass {
    * @private
    */
   _cancelTick() {
-    if (this.handleTimer) {
-      clearTimeout(this.handleTimer)
-      this.handleTimer = null
-    }
+    this.ticker.stop()
   }
 
   /**
    * @private
    */
   _startTick() {
-    const self = this
-    self.retryStatus = 'normal'
-
-    self._cancelTick()
-    self.sortData()
-
-    function dataHandle() {
-      if (self._status === 'closed' && self.retryStatus === 'stop') {
-        self._cancelTick()
+    this.retryStatus = 'normal'
+    this.sortData()
+    this.ticker.start(() => {
+      if (this._status === 'closed' && this.retryStatus === 'stop') {
+        this._cancelTick()
         return
       }
-      if (self._status === 'playing') {
-        self.readData()
-        self.dataHandle()
+      if (this._status === 'playing') {
+        this.readData()
+        this.dataHandle()
       }
-      if (self.retryStatus !== 'stop' || self._status === 'paused') {
-        self.handleTimer = setTimeout(dataHandle, 250)
-      }
-    }
-    dataHandle()
+    })
   }
   // 启动弹幕渲染主进程
   start() {
