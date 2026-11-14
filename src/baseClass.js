@@ -2,7 +2,8 @@ import Log from './utils/logger'
 
 class BaseClass {
   setLogger(logger) {
-    this.logger = logger instanceof Log ? logger : new Log((logger || '') + '.js')
+    this.logger =
+      logger instanceof Log ? logger : new Log((logger || '') + '.js')
   }
 }
 

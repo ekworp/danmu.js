@@ -71,7 +71,10 @@ export class DanmuJs extends BaseClass {
     /**
      * @type {HTMLElement}
      */
-    this.container = config.container && config.container.nodeType === 1 ? config.container : null
+    this.container =
+      config.container && config.container.nodeType === 1
+        ? config.container
+        : null
     if (!this.container) {
       // eslint-disable-next-line quotes
       this.emit('error', "container id can't be empty")
@@ -171,7 +174,8 @@ export class DanmuJs extends BaseClass {
       return
     }
 
-    const options = typeof responsiveFontSize === 'object' ? responsiveFontSize : {}
+    const options =
+      typeof responsiveFontSize === 'object' ? responsiveFontSize : {}
     const min = Number.isFinite(options.min) ? options.min : 0
     const max = Number.isFinite(options.max) ? options.max : Infinity
     const scale = currentSize / this._responsiveFontSizeBase
@@ -272,7 +276,7 @@ export class DanmuJs extends BaseClass {
     this.stop()
     this.bulletBtn && this.bulletBtn.destroy()
     this.recycler && this.recycler.destroy()
-    for (let k in this) {
+    for (const k in this) {
       delete this[k]
     }
     this.emit('destroy')
@@ -292,7 +296,12 @@ export class DanmuJs extends BaseClass {
       comment.duration = 15000
     }
 
-    if (comment && comment.id && comment.duration && (comment.el || comment.elLazyInit || comment.txt)) {
+    if (
+      comment &&
+      comment.id &&
+      comment.duration &&
+      (comment.el || comment.elLazyInit || comment.txt)
+    ) {
       comment.duration = comment.duration ? comment.duration : 5000
       if (!comment.style) {
         comment.style = {
@@ -324,7 +333,8 @@ export class DanmuJs extends BaseClass {
   }
 
   setCommentID(oldID, newID) {
-    this.logger && this.logger.info(`setCommentID: oldID ${oldID} newID ${newID}`)
+    this.logger &&
+      this.logger.info(`setCommentID: oldID ${oldID} newID ${newID}`)
     if (oldID && newID) {
       this.main.data.some((data) => {
         if (data.id === oldID) {
@@ -348,7 +358,8 @@ export class DanmuJs extends BaseClass {
   }
 
   setCommentDuration(id, duration) {
-    this.logger && this.logger.info(`setCommentDuration: id ${id} duration ${duration}`)
+    this.logger &&
+      this.logger.info(`setCommentDuration: id ${id} duration ${duration}`)
 
     if (id && duration) {
       duration = duration ? duration : 5000
@@ -403,10 +414,9 @@ export class DanmuJs extends BaseClass {
     this.logger && this.logger.info(`restartComment: id ${id}`)
 
     if (id) {
-      const self = this
-      const main = self.main
+      const main = this.main
 
-      self._releaseCtrl(id)
+      this._releaseCtrl(id)
 
       if (main.status === 'closed') {
         // The main process has been stopped, there is no need to drive the barrage to run
@@ -432,11 +442,9 @@ export class DanmuJs extends BaseClass {
    * @private
    */
   _releaseCtrl(id) {
-    const self = this
-
-    if (self.freezeId && id === self.freezeId) {
-      self.mouseControl = false
-      self.freezeId = null
+    if (this.freezeId && id === this.freezeId) {
+      this.mouseControl = false
+      this.freezeId = null
     }
   }
 
@@ -452,11 +460,9 @@ export class DanmuJs extends BaseClass {
     this.logger && this.logger.info(`freezeComment: id ${id}`)
 
     if (id) {
-      const self = this
+      this._freezeCtrl(id)
 
-      self._freezeCtrl(id)
-
-      self.main.queue.some((item) => {
+      this.main.queue.some((item) => {
         if (item.id === id) {
           item.status = 'forcedPause'
           item.pauseMove()
@@ -475,10 +481,9 @@ export class DanmuJs extends BaseClass {
     this.logger && this.logger.info(`removeComment: id ${id}`)
 
     if (id) {
-      const self = this
-      const { main } = self
-      
-      self._releaseCtrl(id)
+      const { main } = this
+
+      this._releaseCtrl(id)
 
       // remove bullet from the queue list
       main.queue = main.queue.filter((item) => {
@@ -500,7 +505,8 @@ export class DanmuJs extends BaseClass {
    * @param {boolean} isClear
    */
   updateComments(comments, isClear = true) {
-    this.logger && this.logger.info(`updateComments: ${comments.length}, isClear ${isClear}`)
+    this.logger &&
+      this.logger.info(`updateComments: ${comments.length}, isClear ${isClear}`)
     const { main } = this
     if (typeof isClear === 'boolean' && isClear) {
       main.data = []
@@ -515,7 +521,10 @@ export class DanmuJs extends BaseClass {
    * @param {number} duration
    */
   setAllDuration(mode = 'scroll', duration, force = true) {
-    this.logger && this.logger.info(`setAllDuration: mode ${mode} duration ${duration} force ${force}`)
+    this.logger &&
+      this.logger.info(
+        `setAllDuration: mode ${mode} duration ${duration} force ${force}`
+      )
     if (duration) {
       duration = duration ? duration : 5000
       if (force) {
@@ -572,7 +581,8 @@ export class DanmuJs extends BaseClass {
       reflow: true
     }
   ) {
-    this.logger && this.logger.info(`setFontSize: size ${size} channelSize ${channelSize}`)
+    this.logger &&
+      this.logger.info(`setFontSize: size ${size} channelSize ${channelSize}`)
     this.fontSize = `${size}px`
     if (size) {
       this.main.data.forEach((data) => {
@@ -616,13 +626,15 @@ export class DanmuJs extends BaseClass {
     if (this.hideArr.indexOf(mode) < 0) {
       this.hideArr.push(mode)
     }
-    let arr = this.main.queue.filter((item) => mode === item.mode || (mode === 'color' && item.color))
+    const arr = this.main.queue.filter(
+      (item) => mode === item.mode || (mode === 'color' && item.color)
+    )
     arr.forEach((item) => item.remove())
   }
 
   show(mode = 'scroll') {
     this.logger && this.logger.info(`show: mode ${mode}`)
-    let index = this.hideArr.indexOf(mode)
+    const index = this.hideArr.indexOf(mode)
     if (index > -1) {
       this.hideArr.splice(index, 1)
     }

@@ -9,16 +9,16 @@ const version = packageJson.version
 
 export default defineConfig({
   lib: [
-    { 
+    {
       format: 'cjs',
       fileName: 'index.cjs'
     },
-    { 
-      format: 'umd', 
+    {
+      format: 'umd',
       name: 'DanmuJs',
       bundle: true,
       syntax: 'es5'
-    },
+    }
   ],
   define: {
     __VERSION__: JSON.stringify(version)
@@ -29,7 +29,7 @@ export default defineConfig({
   output: {
     target: 'web',
     sourceMap: true,
-    minify: true,
+    minify: true
   },
   tools: {
     cssExtract: false,
@@ -38,11 +38,7 @@ export default defineConfig({
         rules: [
           {
             test: /\.scss$/,
-            use: [
-              'style-loader',
-              'css-loader',
-              'sass-loader'
-            ]
+            use: ['style-loader', 'css-loader', 'sass-loader']
           }
         ]
       },
@@ -59,11 +55,13 @@ export default defineConfig({
       setup(api) {
         api.onAfterBuild(async () => {
           // 开发模式下跳过 UMD 兼容性处理
-          const isDev = process.env.NODE_ENV === 'development' || process.argv.includes('--watch')
+          const isDev =
+            process.env.NODE_ENV === 'development' ||
+            process.argv.includes('--watch')
           if (isDev) {
             return
           }
-          
+
           await makeUmdNodeCompatible()
           await copyToBrowserDirectory()
         })
@@ -78,9 +76,9 @@ export default defineConfig({
 async function makeUmdNodeCompatible() {
   const fs = await import('fs')
   const umdPath = './dist/index.js'
-  
+
   let content = fs.readFileSync(umdPath, 'utf8')
-  
+
   // 全局变量兜底逻辑
   const globalFallback = [
     'typeof window!=="undefined"?window',
@@ -89,11 +87,11 @@ async function makeUmdNodeCompatible() {
     'typeof global!=="undefined"?global',
     'this'
   ].join(':')
-  
+
   // 替换 UMD 包装器中的 self
   const pattern = /([)}\s]*\(\s*)self(\s*,)/g
   content = content.replace(pattern, `$1${globalFallback}$2`)
-  
+
   fs.writeFileSync(umdPath, content)
   console.log('✅ Modified UMD to be Node.js compatible')
 }
@@ -104,5 +102,7 @@ async function makeUmdNodeCompatible() {
 async function copyToBrowserDirectory() {
   mkdirSync('./browser', { recursive: true })
   copyFileSync('./dist/index.js', './browser/index.js')
-  console.log('✅ Copied dist/index.js to browser/index.js for backward compatibility')
+  console.log(
+    '✅ Copied dist/index.js to browser/index.js for backward compatibility'
+  )
 }

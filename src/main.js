@@ -70,7 +70,7 @@ class Main extends BaseClass {
     this._cancelTick()
     this.channel && this.channel.destroy()
     this.data = []
-    for (let k in this) {
+    for (const k in this) {
       delete this[k]
     }
   }
@@ -211,35 +211,33 @@ class Main extends BaseClass {
   // 启动弹幕渲染主进程
   start() {
     this.logger && this.logger.info('start')
-    const self = this
 
-    if (self._status === 'playing') {
+    if (this._status === 'playing') {
       return
     }
 
-    self._status = 'playing'
-    self.queue = []
-    self.container.innerHTML = ''
-    self.channel.reset()
-    self._startTick()
+    this._status = 'playing'
+    this.queue = []
+    this.container.innerHTML = ''
+    this.channel.reset()
+    this._startTick()
   }
   stop() {
     this.logger && this.logger.info('stop')
-    const self = this
 
-    if (self._status === 'closed') {
+    if (this._status === 'closed') {
       return
     }
 
-    self._status = 'closed'
-    self.retryStatus = 'stop'
-    self.queue = []
+    this._status = 'closed'
+    this.retryStatus = 'stop'
+    this.queue = []
 
-    if (self.container) {
-      self.container.innerHTML = ''
+    if (this.container) {
+      this.container.innerHTML = ''
     }
-    self.channel && self.channel.reset()
-    self._cancelTick()
+    this.channel && this.channel.reset()
+    this._cancelTick()
   }
   clear() {
     this.logger && this.logger.info('clear')
@@ -258,7 +256,7 @@ class Main extends BaseClass {
 
     this.logger && this.logger.info('play')
     this._status = 'playing'
-    let channels = this.channel.channels
+    const channels = this.channel.channels
     if (channels && channels.length > 0) {
       // eslint-disable-next-line no-extra-semi
       ;['scroll', 'top', 'bottom'].forEach((key) => {
@@ -285,7 +283,7 @@ class Main extends BaseClass {
     this._status = 'paused'
     this._cancelTick()
 
-    let channels = this.channel.channels
+    const channels = this.channel.channels
     if (channels && channels.length > 0) {
       // ['scroll', 'top', 'bottom'].forEach( key => {
       //   for (let i = 0; i < channels.length; i++) {
@@ -300,12 +298,11 @@ class Main extends BaseClass {
     }
   }
   dataHandle() {
-    const self = this
     if (this._status === 'paused' || this._status === 'closed') {
       return
     }
-    if (self.queue.length) {
-      self.queue.forEach((item) => {
+    if (this.queue.length) {
+      this.queue.forEach((item) => {
         if (item.status === 'waiting') {
           item.startMove()
         }
@@ -313,8 +310,7 @@ class Main extends BaseClass {
     }
   }
   readData() {
-    const self = this
-    const { danmu, interval, channel } = self,
+    const { danmu, interval, channel } = this,
       player = danmu.player
     let result,
       /**
@@ -329,9 +325,11 @@ class Main extends BaseClass {
     if (!danmu.isReady || !danmu.main) return
 
     if (player) {
-      const currentTime = player.currentTime ? Math.floor(player.currentTime * 1000) : 0
+      const currentTime = player.currentTime
+        ? Math.floor(player.currentTime * 1000)
+        : 0
 
-      list = self.data.filter((item) => {
+      list = this.data.filter((item) => {
         if (!item.start && danmu.hideArr.indexOf(item.mode) < 0) {
           if (!item.color || danmu.hideArr.indexOf('color') < 0) {
             item.start = currentTime
@@ -348,15 +346,18 @@ class Main extends BaseClass {
 
       if (danmu.config.highScorePriority) {
         // 高积分弹幕优先展示
-        list.sort((prev, cur) => (cur.prior && !prev.prior) || (cur.score || -1) - (prev.score || -1))
+        list.sort(
+          (prev, cur) =>
+            (cur.prior && !prev.prior) || (cur.score || -1) - (prev.score || -1)
+        )
       }
 
       if (danmu.live) {
-        self.data = []
+        this.data = []
       }
     } else {
-      list = self.data.splice(0, 1)
-      if (list.length === 0) list = self.playedData.splice(0, 1)
+      list = this.data.splice(0, 1)
+      if (list.length === 0) list = this.playedData.splice(0, 1)
     }
 
     if (list.length > 0 && channel.checkAvailableTrack(list[0].mode)) {
@@ -365,10 +366,10 @@ class Main extends BaseClass {
 
       let tryCount = MAX_TRY_COUNT
 
-      ListLoop: for (let i = 0, item; i < list.length; i++) {
+      for (let i = 0, item; i < list.length; i++) {
         item = list[i]
-        if (self.forceDuration && self.forceDuration !== item.duration) {
-          item.duration = self.forceDuration
+        if (this.forceDuration && this.forceDuration !== item.duration) {
+          item.duration = this.forceDuration
         }
         bullet = new Bullet(danmu, item)
         if (!bullet.bulletCreateFail) {
@@ -377,13 +378,13 @@ class Main extends BaseClass {
           result = channel.addBullet(bullet)
 
           if (result.result) {
-            self.queue.push(bullet)
+            this.queue.push(bullet)
             bullet.topInit()
 
             tryCount = MAX_TRY_COUNT
           } else {
             bullet.detach()
-            for (let k in bullet) {
+            for (const k in bullet) {
               if (hasOwnProperty.call(bullet, k)) {
                 delete bullet[k]
               }
@@ -392,21 +393,21 @@ class Main extends BaseClass {
             item.attached_ = false
             if (item.noDiscard) {
               if (item.prior) {
-                self.data.unshift(item)
+                this.data.unshift(item)
               } else {
-                self.data.push(item)
+                this.data.push(item)
               }
             }
 
             if (tryCount === 0) {
-              break ListLoop
+              break
             } else {
               tryCount--
             }
           }
         } else {
           if (tryCount === 0) {
-            break ListLoop
+            break
           } else {
             tryCount--
           }
@@ -425,7 +426,10 @@ class Main extends BaseClass {
     let deleteCount = 0
 
     // Support data pool to control watermark automatically
-    if (typeof config.maxCommentsLength === 'number' && data.length > config.maxCommentsLength) {
+    if (
+      typeof config.maxCommentsLength === 'number' &&
+      data.length > config.maxCommentsLength
+    ) {
       deleteCount = data.length - config.maxCommentsLength
 
       for (let i = 0, comment; i < deleteCount; i++) {

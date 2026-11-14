@@ -164,9 +164,10 @@ danmu.setCommentLike(id, {
 ```
 $ git clone git@github.com:bytedance/danmu.js.git
 $ cd danmu.js
-$ yarn
-$ yarn build
-$ yarn serve
+$ pnpm install
+$ pnpm run check
+$ pnpm run build
+$ pnpm serve
 ```
 
 访问 [http://localhost:3000/demo/index.html](http://localhost:3000/demo/index.html)

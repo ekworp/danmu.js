@@ -86,7 +86,8 @@ export function deepCopy(dst, src) {
           deepCopy(dst[key], src[key])
         }
       } else if (typeOf(src[key]) === 'Array') {
-        dst[key] = typeOf(dst[key]) === 'Array' ? dst[key].concat(src[key]) : src[key]
+        dst[key] =
+          typeOf(dst[key]) === 'Array' ? dst[key].concat(src[key]) : src[key]
       } else {
         dst[key] = src[key]
       }

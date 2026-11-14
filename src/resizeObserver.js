@@ -96,4 +96,4 @@ function destroyObserver(target, handler) {
   resizeObserver.destroyObserver(target, handler)
 }
 
-export { addObserver, unObserver, destroyObserver }
+export { addObserver, destroyObserver, unObserver }

@@ -15,22 +15,21 @@ class Channel extends BaseClass {
    */
   constructor(danmu) {
     super()
-    const self = this
 
-    self.setLogger('channel')
-    self.danmu = danmu
-    self.width = 0
-    self.height = 0
-    self.reset(true)
+    this.setLogger('channel')
+    this.danmu = danmu
+    this.width = 0
+    this.height = 0
+    this.reset(true)
     /** @type {Array.<{id: number, queue: {scroll: Array.<Bullet>, top: Array.<Bullet>, bottom: Array.<Bullet>}, operating: {scroll: boolean, top: boolean, bottom: boolean}, bookId: {}}>} */
-    self.channels = []
-    self.updatePos()
+    this.channels = []
+    this.updatePos()
 
     attachEventListener(
       this.danmu,
       'bullet_remove',
       (r) => {
-        self.removeBullet(r.bullet)
+        this.removeBullet(r.bullet)
       },
       'destroy'
     )
@@ -38,7 +37,7 @@ class Channel extends BaseClass {
       this.danmu,
       'channel_resize',
       () => {
-        self.resize()
+        this.resize()
       },
       'destroy'
     )
@@ -126,7 +125,7 @@ class Channel extends BaseClass {
         return
       }
       const { container } = self.danmu
-      let size = container.getBoundingClientRect()
+      const size = container.getBoundingClientRect()
       self.width = size.width
       self.height = size.height
 
@@ -180,13 +179,11 @@ class Channel extends BaseClass {
    * @param {import('./bullet').Bullet} bullet
    */
   addBullet(bullet) {
-    // this.logger && this.logger.info(`addBullet ${bullet.options.txt || '[DOM Element]'}`)
-    const self = this
     const danmu = this.danmu
     const channels = this.channels
     let channelHeight, channelWidth, occupy
 
-    if (self.direction === 'b2t') {
+    if (this.direction === 'b2t') {
       channelWidth = this.channelWidth
       occupy = Math.ceil(bullet.width / channelWidth)
     } else {
@@ -203,7 +200,9 @@ class Channel extends BaseClass {
         channel,
         pos = -1
       for (let i = 0, max = channels.length; i < max; i++) {
-        if (channels[i].queue[bullet.mode].some((item) => item.id === bullet.id)) {
+        if (
+          channels[i].queue[bullet.mode].some((item) => item.id === bullet.id)
+        ) {
           return {
             result: false,
             message: `exited, channelOrder=${i},danmu_id=${bullet.id}`
@@ -215,7 +214,10 @@ class Channel extends BaseClass {
           flag = true
           for (let j = i; j < i + occupy; j++) {
             channel = channels[j]
-            if (channel.operating.scroll || (channel.bookId.scroll && channel.bookId.scroll !== bullet.id)) {
+            if (
+              channel.operating.scroll ||
+              (channel.bookId.scroll && channel.bookId.scroll !== bullet.id)
+            ) {
               flag = false
               break
             }
@@ -228,14 +230,14 @@ class Channel extends BaseClass {
               const curBulletPos = curBullet.el.getBoundingClientRect()
 
               // 1. 检测最后入轨弹幕是否已经完全飘入容器区域
-              if (self.direction === 'b2t') {
-                if (curBulletPos.bottom >= self.containerPos.bottom) {
+              if (this.direction === 'b2t') {
+                if (curBulletPos.bottom >= this.containerPos.bottom) {
                   flag = false
                   channel.operating.scroll = false
                   break
                 }
               } else {
-                if (curBulletPos.right >= self.containerPos.right) {
+                if (curBulletPos.right >= this.containerPos.right) {
                   flag = false
                   channel.operating.scroll = false
                   break
@@ -247,21 +249,21 @@ class Channel extends BaseClass {
                 curT,
                 newV = bullet.moveV,
                 catchS
-              if (self.direction === 'b2t') {
-                curS = curBulletPos.bottom - self.containerTop
+              if (this.direction === 'b2t') {
+                curS = curBulletPos.bottom - this.containerTop
                 curT = curS / curV
 
-                catchS = self.containerHeight + bullet.random - curS
+                catchS = this.containerHeight + bullet.random - curS
               } else {
-                curS = curBulletPos.right - self.containerLeft
+                curS = curBulletPos.right - this.containerLeft
                 curT = curS / curV
 
-                catchS = self.containerWidth + bullet.random - curS
+                catchS = this.containerWidth + bullet.random - curS
               }
 
               // 2. 当前轨道内，新弹幕速度大于最后一个入轨弹幕速度，考虑碰撞问题
               if (newV > curV) {
-                let catchT = catchS / (newV - curV)
+                const catchT = catchS / (newV - curV)
 
                 if (!danmu.config.bOffset) {
                   danmu.config.bOffset = 0
@@ -270,9 +272,13 @@ class Channel extends BaseClass {
                 // 3. 相遇时间小于最后弹幕飘出时间
                 if (curT + danmu.config.bOffset >= catchT) {
                   // 根据前一个弹幕剩余飘出时间，计算新弹幕需要增加的offset
-                  const offset = curT * newV - self.containerPos.width
+                  const offset = curT * newV - this.containerPos.width
                   if (offset > 0) {
-                    bullet.updateOffset(offset + (1 + Math.ceil(5 * Math.random())) /* 防止最后过于接近 */)
+                    bullet.updateOffset(
+                      offset +
+                        (1 +
+                          Math.ceil(5 * Math.random())) /* 防止最后过于接近 */
+                    )
                   }
                 }
               }
@@ -297,7 +303,10 @@ class Channel extends BaseClass {
               flag = false
               break
             }
-            if ((channel.bookId[bullet.mode] || bullet.prior) && channel.bookId[bullet.mode] !== bullet.id) {
+            if (
+              (channel.bookId[bullet.mode] || bullet.prior) &&
+              channel.bookId[bullet.mode] !== bullet.id
+            ) {
               flag = false
               break
             }
@@ -327,7 +336,10 @@ class Channel extends BaseClass {
               flag = false
               break
             }
-            if ((channel.bookId[bullet.mode] || bullet.prior) && channel.bookId[bullet.mode] !== bullet.id) {
+            if (
+              (channel.bookId[bullet.mode] || bullet.prior) &&
+              channel.bookId[bullet.mode] !== bullet.id
+            ) {
               flag = false
               break
             }
@@ -353,16 +365,16 @@ class Channel extends BaseClass {
           channel.queue[bullet.mode].unshift(bullet)
           if (bullet.prior) {
             delete channel.bookId[bullet.mode]
-            self.logger && self.logger.info(i + '号轨道恢复正常使用')
+            this.logger && this.logger.info(i + '号轨道恢复正常使用')
           }
           channel.operating[bullet.mode] = false
         }
         if (bullet.prior) {
-          self.logger && self.logger.info(bullet.id + '号优先弹幕运行完毕')
+          this.logger && this.logger.info(bullet.id + '号优先弹幕运行完毕')
           delete bullet['bookChannelId']
           if (danmu.player) {
-            let dataList = danmu.bulletBtn.main.data
-            dataList.some(function (item) {
+            const dataList = danmu.bulletBtn.main.data
+            dataList.some((item) => {
               if (item.id === bullet.id) {
                 delete item['bookChannelId']
                 return true
@@ -375,15 +387,15 @@ class Channel extends BaseClass {
         bullet.channel_id = [pos, occupy]
         bullet.el.setAttribute('data-line-index', pos + 1)
 
-        if (self.direction === 'b2t') {
+        if (this.direction === 'b2t') {
           bullet.top = pos * channelWidth
-          if (self.danmu.config.area && self.danmu.config.area.start) {
-            bullet.top += self.containerWidth * self.danmu.config.area.start
+          if (this.danmu.config.area && this.danmu.config.area.start) {
+            bullet.top += this.containerWidth * this.danmu.config.area.start
           }
         } else {
           bullet.top = pos * channelHeight
-          if (self.danmu.config.area && self.danmu.config.area.start) {
-            bullet.top += self.containerHeight * self.danmu.config.area.start
+          if (this.danmu.config.area && this.danmu.config.area.start) {
+            bullet.top += this.containerHeight * this.danmu.config.area.start
           }
         }
         return {
@@ -396,12 +408,12 @@ class Channel extends BaseClass {
           let start = 0
           let deleteIndex = -1
           let deleteItem = null
-          self.danmu.bulletBtn.main.queue.forEach((item, index) => {
+          this.danmu.bulletBtn.main.queue.forEach((item, index) => {
             if (
               !item.prior &&
               !item.options.realTime &&
               item.el &&
-              item.el.getBoundingClientRect().left > self.containerPos.right &&
+              item.el.getBoundingClientRect().left > this.containerPos.right &&
               item.start >= start
             ) {
               start = item.start
@@ -411,11 +423,12 @@ class Channel extends BaseClass {
           })
           if (deleteItem) {
             deleteItem.remove()
-            self.removeBullet(deleteItem)
-            self.danmu.bulletBtn.main.queue.splice(deleteIndex, 1)
+            this.removeBullet(deleteItem)
+            this.danmu.bulletBtn.main.queue.splice(deleteIndex, 1)
             bullet.channel_id = deleteItem.channel_id
             for (
-              let i = deleteItem.channel_id[0], max = deleteItem.channel_id[0] + deleteItem.channel_id[1];
+              let i = deleteItem.channel_id[0],
+                max = deleteItem.channel_id[0] + deleteItem.channel_id[1];
               i < max;
               i++
             ) {
@@ -428,8 +441,8 @@ class Channel extends BaseClass {
               channel.operating[bullet.mode] = false
             }
             bullet.top = deleteItem.top
-            if (self.danmu.config.area && self.danmu.config.area.start) {
-              bullet.top += self.containerHeight * self.danmu.config.area.start
+            if (this.danmu.config.area && this.danmu.config.area.start) {
+              bullet.top += this.containerHeight * this.danmu.config.area.start
             }
             return {
               result: bullet,
@@ -439,7 +452,7 @@ class Channel extends BaseClass {
         }
 
         if (bullet.prior) {
-          if (!bullet.bookChannelId && !self.danmu.live) {
+          if (!bullet.bookChannelId && !this.danmu.live) {
             pos = -1
             for (let i = 0, max = channels.length - occupy; i <= max; i++) {
               flag = true
@@ -457,17 +470,29 @@ class Channel extends BaseClass {
             if (pos !== -1) {
               for (let j = pos; j < pos + occupy; j++) {
                 channels[j].bookId[bullet.mode] = bullet.id
-                self.logger && self.logger.info(j + '号轨道被' + bullet.id + '号优先弹幕预定')
+                this.logger &&
+                  this.logger.info(
+                    j + '号轨道被' + bullet.id + '号优先弹幕预定'
+                  )
               }
-              let nextAddTime = 2
+              const nextAddTime = 2
               if (danmu.player) {
-                let dataList = danmu.bulletBtn.main.data
-                dataList.some(function (item) {
+                const dataList = danmu.bulletBtn.main.data
+                dataList.some((item) => {
                   if (item.id === bullet.id) {
-                    self.logger && self.logger.info(bullet.id + '号优先弹幕将于' + nextAddTime + '秒后再次请求注册')
+                    this.logger &&
+                      this.logger.info(
+                        bullet.id +
+                          '号优先弹幕将于' +
+                          nextAddTime +
+                          '秒后再次请求注册'
+                      )
                     item.start += nextAddTime * 1000
                     item.bookChannelId = [pos, occupy]
-                    self.logger && self.logger.info(`${bullet.id}号优先弹幕预定了${pos}~${pos + occupy - 1}号轨道`)
+                    this.logger &&
+                      this.logger.info(
+                        `${bullet.id}号优先弹幕预定了${pos}~${pos + occupy - 1}号轨道`
+                      )
                     return true
                   } else {
                     return false
@@ -476,12 +501,18 @@ class Channel extends BaseClass {
               }
             }
           } else {
-            let nextAddTime = 2
+            const nextAddTime = 2
             if (danmu.player) {
-              let dataList = danmu.bulletBtn.main.data
-              dataList.some(function (item) {
+              const dataList = danmu.bulletBtn.main.data
+              dataList.some((item) => {
                 if (item.id === bullet.id) {
-                  self.logger && self.logger.info(bullet.id + '号优先弹幕将于' + nextAddTime + '秒后再次请求注册')
+                  this.logger &&
+                    this.logger.info(
+                      bullet.id +
+                        '号优先弹幕将于' +
+                        nextAddTime +
+                        '秒后再次请求注册'
+                    )
                   item.start += nextAddTime * 1000
                   return true
                 } else {
@@ -500,12 +531,17 @@ class Channel extends BaseClass {
     }
   }
   removeBullet(bullet) {
-    this.logger && this.logger.info(`removeBullet ${bullet.options.txt || '[DOM Element]'}`)
+    this.logger &&
+      this.logger.info(`removeBullet ${bullet.options.txt || '[DOM Element]'}`)
 
-    let channels = this.channels
-    let channelId = bullet.channel_id
+    const channels = this.channels
+    const channelId = bullet.channel_id
     let channel
-    for (let i = channelId[0], max = channelId[0] + channelId[1]; i < max; i++) {
+    for (
+      let i = channelId[0], max = channelId[0] + channelId[1];
+      i < max;
+      i++
+    ) {
       channel = channels[i]
       if (channel) {
         channel.operating[bullet.mode] = true
@@ -540,9 +576,9 @@ class Channel extends BaseClass {
     if (!this.danmu || !this.danmu.config) {
       return
     }
-    const self = this
-    const { config } = self.danmu
-    const channelSize = config.channelSize || (/mobile/gi.test(navigator.userAgent) ? 10 : 12)
+    const { config } = this.danmu
+    const channelSize =
+      config.channelSize || (/mobile/gi.test(navigator.userAgent) ? 10 : 12)
     /** @type {number} */
     let channelCount
 
@@ -551,32 +587,32 @@ class Channel extends BaseClass {
       if (validAreaLineRule(lines)) {
         channelCount = lines
 
-        if (self.direction === 'b2t') {
-          self.width = channelCount * channelSize
+        if (this.direction === 'b2t') {
+          this.width = channelCount * channelSize
         } else {
-          self.height = channelCount * channelSize
+          this.height = channelCount * channelSize
         }
       } else {
         if (start >= 0 && end >= start) {
           const modulus = end - start
-          if (self.direction === 'b2t') {
-            self.width = Math.floor(self.width * modulus)
+          if (this.direction === 'b2t') {
+            this.width = Math.floor(this.width * modulus)
           } else {
-            self.height = Math.floor(self.height * modulus)
+            this.height = Math.floor(this.height * modulus)
           }
         }
       }
     }
 
     if (!isNumber(channelCount)) {
-      if (self.direction === 'b2t') {
-        channelCount = Math.floor(self.width / channelSize)
+      if (this.direction === 'b2t') {
+        channelCount = Math.floor(this.width / channelSize)
       } else {
-        channelCount = Math.floor(self.height / channelSize)
+        channelCount = Math.floor(this.height / channelSize)
       }
     }
 
-    let channels = []
+    const channels = []
     for (let i = 0; i < channelCount; i++) {
       channels[i] = {
         id: i,
@@ -603,7 +639,7 @@ class Channel extends BaseClass {
 
   resize(sync = false) {
     this.logger && this.logger.info('resize')
-    let self = this
+    const self = this
     if (self.resizing) {
       return
     }
@@ -640,10 +676,15 @@ class Channel extends BaseClass {
       function updateBottomQueue(i) {
         self.channels[i].queue['bottom'].forEach((item) => {
           if (item.el) {
-            channels[i + channels.length - self.channels.length].queue['bottom'].push(item)
+            channels[i + channels.length - self.channels.length].queue[
+              'bottom'
+            ].push(item)
             if (item.channel_id[0] + item.channel_id[1] - 1 === i) {
-              let channel_id = [].concat(item.channel_id)
-              item.channel_id = [channel_id[0] - self.channels.length + channels.length, channel_id[1]]
+              const channel_id = [].concat(item.channel_id)
+              item.channel_id = [
+                channel_id[0] - self.channels.length + channels.length,
+                channel_id[1]
+              ]
               item.top = item.channel_id[0] * fontSize
               if (self.danmu.config.area && self.danmu.config.area.start) {
                 item.top += self.containerHeight * self.danmu.config.area.start
@@ -688,7 +729,8 @@ class Channel extends BaseClass {
           } else if (key === 'bottom' && i <= Math.floor(channels.length / 2)) {
             //
           } else {
-            let num = key === 'bottom' ? i - channels.length + self.channels.length : i
+            const num =
+              key === 'bottom' ? i - channels.length + self.channels.length : i
             self.channels[num].queue[key].forEach((item, index) => {
               if (!item.el) {
                 return
@@ -696,11 +738,15 @@ class Channel extends BaseClass {
               channels[i].queue[key].push(item)
               if (key === 'bottom') {
                 if (item.channel_id[0] + item.channel_id[1] - 1 === num) {
-                  let channel_id = [].concat(item.channel_id)
-                  item.channel_id = [channel_id[0] - self.channels.length + channels.length, channel_id[1]]
+                  const channel_id = [].concat(item.channel_id)
+                  item.channel_id = [
+                    channel_id[0] - self.channels.length + channels.length,
+                    channel_id[1]
+                  ]
                   item.top = item.channel_id[0] * fontSize
                   if (self.danmu.config.area && self.danmu.config.area.start) {
-                    item.top += self.containerHeight * self.danmu.config.area.start
+                    item.top +=
+                      self.containerHeight * self.danmu.config.area.start
                   }
                   item.topInit()
                 }
@@ -737,7 +783,8 @@ class Channel extends BaseClass {
         bulletBtn.main.data.forEach((item) => {
           if (item.bookChannelId) {
             delete item['bookChannelId']
-            self.logger && self.logger.info('resize导致' + item.id + '号优先弹幕预定取消')
+            self.logger &&
+              self.logger.info('resize导致' + item.id + '号优先弹幕预定取消')
           }
         })
       }

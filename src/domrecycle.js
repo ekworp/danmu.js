@@ -53,7 +53,7 @@ export default class RecyclableDOMList {
       this.usingList[i].textcontent = ''
       this.clearElementStyle(this.usingList[i])
     }
-    for (let k in this) {
+    for (const k in this) {
       if (hasOwnProperty.call(this, k)) {
         delete this[k]
       }

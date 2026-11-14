@@ -1,6 +1,12 @@
 import BaseClass from './baseClass'
 import Log from './utils/logger'
-import { copyDom, isFunction, isNumber, styleCSSText, styleUtil } from './utils/util'
+import {
+  copyDom,
+  isFunction,
+  isNumber,
+  styleCSSText,
+  styleUtil
+} from './utils/util'
 
 // 减少频繁的内存创建
 const logger = new Log('bullet')
@@ -29,7 +35,10 @@ export class Bullet extends BaseClass {
     this.id = options.id
     this.container = container
     /** @type {'scroll' | 'top' | 'bottom'} */
-    this.mode = options.mode === 'top' || options.mode === 'bottom' ? options.mode : 'scroll'
+    this.mode =
+      options.mode === 'top' || options.mode === 'bottom'
+        ? options.mode
+        : 'scroll'
     this.start = options.start
     this.prior = options.prior
     this.realTime = options.realTime
@@ -56,22 +65,21 @@ export class Bullet extends BaseClass {
     }
   }
   get moveV() {
-    const self = this
-    const { danmu, options } = self
-    let v = self._moveV
+    const { danmu, options } = this
+    let v = this._moveV
 
     if (!v) {
       if (options.moveV) {
         v = options.moveV
       } else {
-        if (self.elPos) {
+        if (this.elPos) {
           const ctPos = danmu.containerPos
           const distance =
-            self.direction === 'b2t'
-              ? ctPos.height + (danmu.config.chaseEffect ? self.height : 0)
-              : ctPos.width + (danmu.config.chaseEffect ? self.width : 0)
+            this.direction === 'b2t'
+              ? ctPos.height + (danmu.config.chaseEffect ? this.height : 0)
+              : ctPos.width + (danmu.config.chaseEffect ? this.width : 0)
 
-          v = (distance / self.duration) * 1000
+          v = (distance / this.duration) * 1000
         }
       }
 
@@ -79,7 +87,7 @@ export class Bullet extends BaseClass {
         v *= danmu.main.playRate
 
         // 固化速度，否则resize时外部获取当前弹幕时会重新计算速度，导致布局异常（重叠），同时提高性能。
-        self._moveV = v
+        this._moveV = v
       }
     }
     return v
@@ -88,14 +96,17 @@ export class Bullet extends BaseClass {
     return this.danmu.direction
   }
   get fullySlideIntoScreen() {
-    const self = this
     let flag = true
 
-    if (self.mode === 'scroll' && self._lastMoveTime && self._fullySlideInScreenDuration > 0) {
+    if (
+      this.mode === 'scroll' &&
+      this._lastMoveTime &&
+      this._fullySlideInScreenDuration > 0
+    ) {
       const now = new Date().getTime()
-      const diff = (now - self._lastMoveTime) / 1000
+      const diff = (now - this._lastMoveTime) / 1000
 
-      if (diff >= self._fullySlideInScreenDuration) {
+      if (diff >= this._fullySlideInScreenDuration) {
         flag = true
       } else {
         flag = false
@@ -116,7 +127,7 @@ export class Bullet extends BaseClass {
      */
     let el
     let cssText = ''
-    let style = options.style || {}
+    const style = options.style || {}
 
     // The use of translate3d pushes css animations into hardware acceleration for more power!
     // Use 'perspective' to try to fix flickering problem after switching to the transform above
@@ -146,10 +157,14 @@ export class Bullet extends BaseClass {
       } else {
         if (options.el.nodeType === 1 && !options.el.parentNode) {
           if (this.reuseDOM) {
-            let copyDOM = copyDom(options.el)
+            const copyDOM = copyDom(options.el)
             if (options.eventListeners && options.eventListeners.length > 0) {
               options.eventListeners.forEach((eventListener) => {
-                copyDOM.addEventListener(eventListener.event, eventListener.listener, eventListener.useCapture || false)
+                copyDOM.addEventListener(
+                  eventListener.event,
+                  eventListener.listener,
+                  eventListener.useCapture || false
+                )
               })
             }
             el = this.recycler.use()
@@ -215,38 +230,38 @@ export class Bullet extends BaseClass {
     return left
   }
   attach() {
-    // this.logger && this.logger.info(`attach #${this.options.txt || '[DOM Element]'}#`)
-    const self = this
-
-    if (self.options.elLazyInit && !self.el) {
-      self._makeEl()
+    if (this.options.elLazyInit && !this.el) {
+      this._makeEl()
     }
 
     // 防止外部钩子进行弹幕实例销毁，或者其他异常操作
-    if (!self.danmu || !self.danmu.main) {
+    if (!this.danmu || !this.danmu.main) {
       return
     }
 
-    const { danmu, options, el } = self
+    const { danmu, options, el } = this
     const { globalHooks } = danmu
 
     if (globalHooks.bulletAttaching) {
       globalHooks.bulletAttaching(options)
     }
 
-    if (!self.container.contains(el)) {
-      self.container.appendChild(el)
+    if (!this.container.contains(el)) {
+      this.container.appendChild(el)
     }
-    self.elPos = el.getBoundingClientRect()
-    if (self.direction === 'b2t') {
-      self.width = self.elPos.height
-      self.height = self.elPos.width
+    this.elPos = el.getBoundingClientRect()
+    if (this.direction === 'b2t') {
+      this.width = this.elPos.height
+      this.height = this.elPos.width
     } else {
-      self.width = self.elPos.width
-      self.height = self.elPos.height
+      this.width = this.elPos.width
+      this.height = this.elPos.height
     }
-    if (self.moveV) {
-      self.duration = ((self.danmu.containerPos.width + self.random + self.width) / self.moveV) * 1000
+    if (this.moveV) {
+      this.duration =
+        ((this.danmu.containerPos.width + this.random + this.width) /
+          this.moveV) *
+        1000
     }
 
     if (globalHooks.bulletAttached) {
@@ -254,9 +269,7 @@ export class Bullet extends BaseClass {
     }
   }
   detach() {
-    // this.logger && this.logger.info(`detach #${this.options.txt || '[DOM Element]'}#`)
-    const self = this
-    const { el, danmu, options } = self
+    const { el, danmu, options } = this
     const { globalHooks } = danmu
 
     if (el) {
@@ -265,8 +278,8 @@ export class Bullet extends BaseClass {
         globalHooks.bulletDetaching(options)
       }
 
-      if (self.reuseDOM) {
-        self.recycler.unused(el)
+      if (this.reuseDOM) {
+        this.recycler.unused(el)
       } else {
         if (el.parentNode) {
           el.parentNode.removeChild(el)
@@ -278,13 +291,14 @@ export class Bullet extends BaseClass {
         globalHooks.bulletDetached(options, el)
       }
 
-      self.el = null
+      this.el = null
     }
 
-    self.elPos = undefined
+    this.elPos = undefined
   }
   topInit() {
-    this.logger && this.logger.info(`topInit #${this.options.txt || '[DOM Element]'}#`)
+    this.logger &&
+      this.logger.info(`topInit #${this.options.txt || '[DOM Element]'}#`)
     if (this.direction === 'b2t') {
       styleUtil(this.el, 'transformOrigin', 'left top')
       styleUtil(
@@ -298,38 +312,36 @@ export class Bullet extends BaseClass {
     }
   }
   pauseMove(isFullscreen = false) {
-    // this.logger && this.logger.info(`pauseMove #${this.options.txt || '[DOM Element]'}#`)
-    const self = this
-    if (self.status === 'paused') {
+    if (this.status === 'paused') {
       return
     }
-    if (self.status !== 'forcedPause') {
+    if (this.status !== 'forcedPause') {
       this.status = 'paused'
     }
 
     // 将记忆速度删除，以备通过接口调整速度或duration时重计速度
-    self._moveV = undefined
+    this._moveV = undefined
 
     if (!this.el) {
       return
     }
     if (this.mode === 'scroll') {
-      const ctPos = self.danmu.containerPos
+      const ctPos = this.danmu.containerPos
       if (isFullscreen) {
-        let pastDuration = (new Date().getTime() - self._lastMoveTime) / 1000
-        let pastS = pastDuration * this.moveV
+        const pastDuration = (new Date().getTime() - this._lastMoveTime) / 1000
+        const pastS = pastDuration * this.moveV
         let ratio = 0
         let nowS = 0
-        if (self.moveMoreS - pastS >= 0) {
+        if (this.moveMoreS - pastS >= 0) {
           if (this.direction === 'b2t') {
-            ratio = (self.moveMoreS - pastS) / self.moveContainerHeight
+            ratio = (this.moveMoreS - pastS) / this.moveContainerHeight
             nowS = ratio * ctPos.height
           } else {
-            ratio = (self.moveMoreS - pastS) / self.moveContainerWidth
+            ratio = (this.moveMoreS - pastS) / this.moveContainerWidth
             nowS = ratio * ctPos.width
           }
         } else {
-          nowS = self.moveMoreS - pastS
+          nowS = this.moveMoreS - pastS
         }
         if (this.direction === 'b2t') {
           styleUtil(
@@ -350,87 +362,102 @@ export class Bullet extends BaseClass {
             }px) translateZ(0px) rotate(90deg)`
           )
         } else {
-          styleUtil(this.el, 'left', `${this.el.getBoundingClientRect().left - ctPos.left}px`)
+          styleUtil(
+            this.el,
+            'left',
+            `${this.el.getBoundingClientRect().left - ctPos.left}px`
+          )
         }
       }
       if (this.direction === 'b2t') {
         // this.el.style.transform = `translateX(-${this.top}px) translateY(${nowS}px) translateZ(0px) rotate(90deg)`
         styleUtil(this.el, 'transition', 'transform 0s linear 0s')
       } else {
-        styleUtil(this.el, 'transform', 'translateX(0px) translateY(0px) translateZ(0px)')
+        styleUtil(
+          this.el,
+          'transform',
+          'translateX(0px) translateY(0px) translateZ(0px)'
+        )
         styleUtil(this.el, 'transition', 'transform 0s linear 0s')
       }
     } else {
       if (!this.pastDuration || !this.startTime) {
         this.pastDuration = 1
       } else {
-        this.pastDuration = this.pastDuration + new Date().getTime() - this.startTime
+        this.pastDuration =
+          this.pastDuration + new Date().getTime() - this.startTime
       }
     }
   }
   startMove(force) {
-    // this.logger && this.logger.info(`startMove #${this.options.txt || '[DOM Element]'}#`)
-    const self = this
-    if (!self.hasMove) {
-      self.danmu.emit('bullet_start', self)
-      self.hasMove = true
+    if (!this.hasMove) {
+      this.danmu.emit('bullet_start', this)
+      this.hasMove = true
     }
-    if (self.status === 'forcedPause' && !force) return
+    if (this.status === 'forcedPause' && !force) return
     if (!this.el) return
     if (this.status === 'start') return
 
     this.status = 'start'
 
     if (this.mode === 'scroll') {
-      const ctPos = self.danmu.containerPos
-      if (!self.el) {
+      const ctPos = this.danmu.containerPos
+      if (!this.el) {
         return
       }
-      const bulletPos = self.el.getBoundingClientRect()
+      const bulletPos = this.el.getBoundingClientRect()
       let fullyMovedToScreenDistance
 
       if (this.direction === 'b2t') {
         fullyMovedToScreenDistance = bulletPos.bottom - ctPos.bottom
 
-        let leftDuration = (bulletPos.bottom - ctPos.top) / this.moveV
-        styleUtil(self.el, 'transition', `transform ${leftDuration}s linear 0s`)
+        const leftDuration = (bulletPos.bottom - ctPos.top) / this.moveV
+        styleUtil(this.el, 'transition', `transform ${leftDuration}s linear 0s`)
         styleUtil(
-          self.el,
+          this.el,
           'transform',
-          `translateX(-${self.top}px) translateY(-${self.height}px) translateZ(0px) rotate(90deg)`
+          `translateX(-${this.top}px) translateY(-${this.height}px) translateZ(0px) rotate(90deg)`
         )
-        self._lastMoveTime = new Date().getTime()
-        self.moveMoreS = bulletPos.top - ctPos.top
-        self.moveContainerHeight = ctPos.height
+        this._lastMoveTime = new Date().getTime()
+        this.moveMoreS = bulletPos.top - ctPos.top
+        this.moveContainerHeight = ctPos.height
       } else {
         fullyMovedToScreenDistance = bulletPos.right - ctPos.right
         const leftDistance = bulletPos.right - ctPos.left
-        const leftDuration = leftDistance / self.moveV
+        const leftDuration = leftDistance / this.moveV
 
         if (bulletPos.right > ctPos.left) {
-          styleUtil(self.el, 'transition', `transform ${leftDuration}s linear 0s`)
-          styleUtil(self.el, 'transform', `translateX(-${leftDistance}px) translateY(0px) translateZ(0px)`)
+          styleUtil(
+            this.el,
+            'transition',
+            `transform ${leftDuration}s linear 0s`
+          )
+          styleUtil(
+            this.el,
+            'transform',
+            `translateX(-${leftDistance}px) translateY(0px) translateZ(0px)`
+          )
 
-          self._lastMoveTime = new Date().getTime()
-          self.moveMoreS = bulletPos.left - ctPos.left
-          self.moveContainerWidth = ctPos.width
+          this._lastMoveTime = new Date().getTime()
+          this.moveMoreS = bulletPos.left - ctPos.left
+          this.moveContainerWidth = ctPos.width
         } else {
-          self.status = 'end'
-          self.remove()
+          this.status = 'end'
+          this.remove()
         }
       }
 
-      self._fullySlideInScreenDuration = fullyMovedToScreenDistance / self.moveV
+      this._fullySlideInScreenDuration = fullyMovedToScreenDistance / this.moveV
     } else {
       const newTimestamp = new Date().getTime()
       const leftDuration =
         (this.startTime && newTimestamp - this.startTime > this.duration
           ? newTimestamp - this.startTime
           : this.duration) / 1000
-      styleUtil(self.el, 'left', '50%')
-      styleUtil(self.el, 'margin', `0 0 0 -${this.width / 2}px`)
-      styleUtil(self.el, 'visibility', 'hidden')
-      styleUtil(self.el, 'transition', `visibility ${leftDuration}s 0s`)
+      styleUtil(this.el, 'left', '50%')
+      styleUtil(this.el, 'margin', `0 0 0 -${this.width / 2}px`)
+      styleUtil(this.el, 'visibility', 'hidden')
+      styleUtil(this.el, 'transition', `visibility ${leftDuration}s 0s`)
       if (!this.pastDuration) {
         this.pastDuration = 1
       }
@@ -438,20 +465,20 @@ export class Bullet extends BaseClass {
     }
   }
   remove(needPause = true) {
-    this.logger && this.logger.info(`remove #${this.options.txt || '[DOM Element]'}#`)
-    const self = this
+    this.logger &&
+      this.logger.info(`remove #${this.options.txt || '[DOM Element]'}#`)
 
     if (needPause) {
-      self.pauseMove()
+      this.pauseMove()
     }
 
-    if (self.el && self.el.parentNode) {
-      self.detach()
+    if (this.el && this.el.parentNode) {
+      this.detach()
       if (this.options.el && this.options.el.nodeType === 1 && this.noCopyEl) {
         styleUtil(this.options.el, 'transform', 'none')
       }
-      self.danmu.emit('bullet_remove', {
-        bullet: self
+      this.danmu.emit('bullet_remove', {
+        bullet: this
       })
     }
   }
@@ -463,13 +490,13 @@ export class Bullet extends BaseClass {
   }
   setLikeDom(el, style) {
     if (el) {
-      Object.keys(style).forEach(function (key) {
+      Object.keys(style).forEach((key) => {
         el.style[key] = style[key]
       })
-      let likeClass = 'danmu-like'
+      const likeClass = 'danmu-like'
       el.className = likeClass
       if (this.el) {
-        let children = this.el.querySelector('.' + likeClass)
+        const children = this.el.querySelector('.' + likeClass)
         if (children) {
           this.el.removeChild(children)
         }
