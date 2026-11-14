@@ -1,7 +1,11 @@
 import { throttle } from './utils/util'
 
 class ResizeObserverWrapper {
-  [key: string]: any
+  private observer: ResizeObserver | null = null
+  private __handlers: Array<{
+    target: Element
+    handler: Array<() => void>
+  }> = []
 
   constructor() {
     this.__handlers = []
@@ -10,7 +14,7 @@ class ResizeObserverWrapper {
     }
     try {
       this.observer = new ResizeObserver(
-        throttle((entries) => {
+        throttle((entries: ResizeObserverEntry[]) => {
           this.__trigger(entries)
         }, 100)
       )
@@ -18,7 +22,7 @@ class ResizeObserverWrapper {
     } catch (err) {}
   }
 
-  addObserver(target, handler) {
+  addObserver(target: Element, handler: () => void): void {
     if (!this.observer || !target) {
       return
     }
@@ -40,7 +44,7 @@ class ResizeObserverWrapper {
     }
   }
 
-  unObserver(target, _handler?) {
+  unObserver(target: Element, _handler?: () => void): void {
     if (!target) {
       return
     }
@@ -54,13 +58,13 @@ class ResizeObserverWrapper {
     i > -1 && this.__handlers.splice(i, 1)
   }
 
-  destroyObserver(_target?, _handler?) {
+  destroyObserver(_target?: Element, _handler?: () => void): void {
     this.observer && this.observer.disconnect()
     this.observer = null
-    this.__handlers = null
+    this.__handlers = []
   }
 
-  __runHandler(target) {
+  __runHandler(target: Element): void {
     const { __handlers } = this
     for (let i = 0; i < __handlers.length; i++) {
       if (__handlers[i] && target === __handlers[i].target) {
@@ -77,7 +81,7 @@ class ResizeObserverWrapper {
     }
   }
 
-  __trigger(entries) {
+  __trigger(entries: ResizeObserverEntry[]): void {
     entries.map((item) => {
       this.__runHandler(item.target)
     })
@@ -86,15 +90,15 @@ class ResizeObserverWrapper {
 
 const resizeObserver = new ResizeObserverWrapper()
 
-function addObserver(target, handler) {
+function addObserver(target: Element, handler: () => void): void {
   resizeObserver.addObserver(target, handler)
 }
 
-function unObserver(target, handler?) {
+function unObserver(target: Element, handler?: () => void): void {
   resizeObserver.unObserver(target, handler)
 }
 
-function destroyObserver(target?, handler?) {
+function destroyObserver(target?: Element, handler?: () => void): void {
   resizeObserver.destroyObserver(target, handler)
 }
 

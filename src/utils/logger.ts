@@ -3,7 +3,7 @@ const DEBUG =
   window.location.href.indexOf('danmu-debug') > -1
 
 class Logger {
-  [key: string]: any
+  private constructorName: string
 
   constructor(constructorName = '') {
     this.constructorName = constructorName || ''
