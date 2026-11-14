@@ -103,6 +103,41 @@ class Channel extends BaseClass {
     return flag
   }
 
+  getAvailableTrackCount(mode: ChannelMode = 'scroll'): number {
+    this.cleanupExpiredBullets()
+    const now = Date.now()
+    return this.channels.reduce((count: number, channel: ChannelState) => {
+      if (
+        channel.availableAt <= now &&
+        !channel.operating[mode] &&
+        (!channel.queue[mode][0] || channel.queue[mode][0].fullySlideIntoScreen)
+      ) {
+        return count + 1
+      }
+      return count
+    }, 0)
+  }
+
+  cleanupExpiredBullets(): void {
+    this.updatePos()
+    for (const channel of this.channels) {
+      for (const mode of ['scroll', 'top', 'bottom'] as ChannelMode[]) {
+        for (const bullet of [...channel.queue[mode]]) {
+          if (!bullet.el || bullet.status !== 'start') continue
+          const rect = bullet.el.getBoundingClientRect()
+          const outside =
+            mode === 'scroll' &&
+            (this.direction === 'b2t'
+              ? rect.bottom <= this.containerTop
+              : this.direction === 'l2r'
+                ? rect.left >= this.containerRight
+                : rect.right <= this.containerLeft)
+          if (outside) bullet.remove(false)
+        }
+      }
+    }
+  }
+
   destroy() {
     this.logger && this.logger.info('destroy')
     this.channels.splice(0, this.channels.length)

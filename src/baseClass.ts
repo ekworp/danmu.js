@@ -72,7 +72,6 @@ export interface DanmuConfig {
   dropStaleComments: boolean
   channelSize?: number
   maxCommentsLength?: number
-  maxBulletsPerTick: number
   maxVisibleBullets: number
   bulletOffset?: number
   interval: number

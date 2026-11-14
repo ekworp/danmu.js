@@ -7,9 +7,6 @@ import type { DanmuJs } from './danmu'
 import { getPlayerCurrentTime } from './player'
 import { hasOwnProperty } from './utils/util'
 
-// 单次尝试入轨弹幕数量越多，长任务及CPU耗时越多
-const MAX_TRY_COUNT = 0
-
 interface EventBindingTarget {
   addEventListener?: (
     event: string,
@@ -39,7 +36,9 @@ class Main extends BaseClass {
   queue!: Bullet[]
   private ticker = new Ticker()
   private readonly runtime = new WeakMap<CommentData, CommentRuntime>()
+  private displayedComments = new WeakSet<CommentData>()
   private tickRequested = false
+  private lastBulletLaunch = 0
 
   /**
    * @param {import('./danmu').DanmuJs} danmu
@@ -240,6 +239,7 @@ class Main extends BaseClass {
       this.setCommentAttached(comment, false)
     })
     this.playedData = []
+    this.displayedComments = new WeakSet<CommentData>()
     this.channel.reset()
     if (this._status === 'playing') {
       this._startTick()
@@ -256,6 +256,142 @@ class Main extends BaseClass {
         this.dataHandle()
       }
     })
+  }
+
+  private selectFairCandidates(
+    list: CommentData[],
+    limit: number
+  ): CommentData[] {
+    if (list.length <= limit) return list
+
+    const buckets = new Map<number, CommentData[]>()
+    for (const item of list) {
+      const bucket = Math.floor(item.start / 1000)
+      const items = buckets.get(bucket)
+      if (items) {
+        items.push(item)
+      } else {
+        buckets.set(bucket, [item])
+      }
+    }
+
+    const entries = [...buckets.entries()]
+    const quotas = entries.map(([, items]) => ({
+      items,
+      quota: 0,
+      ideal: (items.length * limit) / list.length,
+      remainder: 0
+    }))
+    let remaining = limit
+
+    for (const entry of quotas) {
+      entry.quota = Math.min(Math.floor(entry.ideal), entry.items.length)
+      entry.remainder = entry.ideal - entry.quota
+      entry.quota = Math.min(entry.quota, entry.items.length)
+      remaining -= entry.quota
+    }
+
+    while (remaining > 0) {
+      const entry = quotas
+        .filter((item) => item.quota < item.items.length)
+        .sort((left, right) => {
+          const remainder = right.remainder - left.remainder
+          return remainder || right.items.length - left.items.length
+        })[0]
+      if (!entry) break
+      entry.quota++
+      remaining--
+    }
+
+    const selected: CommentData[] = []
+    for (const { items, quota } of quotas) {
+      if (quota === 0) continue
+      if (quota === items.length) {
+        selected.push(...items)
+        continue
+      }
+
+      for (let i = 0; i < quota; i++) {
+        const index = Math.floor((i * items.length) / quota)
+        selected.push(items[index])
+      }
+    }
+
+    return selected
+  }
+
+  private getVisibleBulletCount(): number {
+    this.channel.cleanupExpiredBullets()
+    const containerRect = this.container.getBoundingClientRect()
+    let count = 0
+
+    for (const bullet of this.queue) {
+      if (!bullet.el || bullet.status === 'end') continue
+      const rect = bullet.el.getBoundingClientRect()
+      if (
+        rect.right > containerRect.left &&
+        rect.left < containerRect.right &&
+        rect.bottom > containerRect.top &&
+        rect.top < containerRect.bottom
+      ) {
+        count++
+      }
+    }
+
+    return count
+  }
+
+  /**
+   * Calculate how many comments may enter on this tick.  The visible limit is
+   * a capacity limit, not a batch size: comments are paced according to the
+   * time it takes a bullet to cross the container and the tracks that can
+   * actually accept one.
+   */
+  private getLaunchBudget(
+    candidates: CommentData[],
+    availableSlots: number
+  ): number {
+    if (availableSlots <= 0 || candidates.length === 0) return 0
+
+    const mode = candidates[0].mode || 'scroll'
+    const availableTracks = this.channel.getAvailableTrackCount(mode)
+    if (availableTracks <= 0) return 0
+
+    const first = candidates[0]
+    const containerSize =
+      this.danmu.direction === 'b2t'
+        ? this.channel.containerHeight
+        : this.channel.containerWidth
+    const speed =
+      first.moveV && first.moveV > 0
+        ? first.moveV * this.playRate
+        : containerSize > 0 && first.duration > 0
+          ? (containerSize / first.duration) * 1000
+          : 0
+    const travelTime =
+      speed > 0 ? (containerSize / speed) * 1000 : first.duration
+    const maxVisible = this.danmu.config.maxVisibleBullets
+    const target =
+      Number.isFinite(maxVisible) && maxVisible > 0
+        ? Math.max(1, Math.min(maxVisible, availableTracks))
+        : Math.max(1, availableTracks)
+    const launchInterval = Math.max(1, travelTime / target)
+    const now = Date.now()
+
+    // The initial credit is derived from the track/visible capacity rather
+    // than being a per-tick comment limit.
+    const trackRate = Math.max(1, Math.floor(availableTracks / target))
+    if (this.lastBulletLaunch === 0) {
+      return Math.min(availableSlots, availableTracks, trackRate)
+    }
+    if (now - this.lastBulletLaunch < launchInterval) {
+      return 0
+    }
+    const due = Math.max(
+      1,
+      Math.floor((now - this.lastBulletLaunch) / launchInterval)
+    )
+    return Math.min(availableSlots, availableTracks, trackRate, due)
   }
 
   /**
@@ -285,6 +421,7 @@ class Main extends BaseClass {
 
     this._status = 'playing'
     this.queue = []
+    this.lastBulletLaunch = 0
     this.container.innerHTML = ''
     this.channel.reset()
     this._startTick()
@@ -299,6 +436,7 @@ class Main extends BaseClass {
     this._status = 'closed'
     this.retryStatus = 'stop'
     this.queue = []
+    this.lastBulletLaunch = 0
 
     if (this.container) {
       this.container.innerHTML = ''
@@ -392,6 +530,7 @@ class Main extends BaseClass {
 
     if (player) {
       const currentTime = Math.floor(getPlayerCurrentTime(player) * 1000)
+      const staleWindow = interval * 2
 
       list = this.data.filter((item) => {
         if (!item.start && danmu.hideArr.indexOf(item.mode) < 0) {
@@ -401,10 +540,12 @@ class Main extends BaseClass {
         }
         return (
           !this.getCommentRuntime(item).attached &&
+          !this.displayedComments.has(item) &&
           danmu.hideArr.indexOf(item.mode) < 0 &&
           (!item.color || danmu.hideArr.indexOf('color') < 0) &&
           item.start - interval <= currentTime &&
-          currentTime <= item.start + interval
+          (!danmu.config.dropStaleComments ||
+            currentTime <= item.start + staleWindow)
         )
       })
 
@@ -426,18 +567,20 @@ class Main extends BaseClass {
     }
 
     const maxVisible = this.danmu.config.maxVisibleBullets
-    const maxPerTick = this.danmu.config.maxBulletsPerTick
+    const availableSlots = Number.isFinite(maxVisible)
+      ? Math.max(maxVisible - this.getVisibleBulletCount(), 0)
+      : Infinity
+    const launchBudget = this.getLaunchBudget(list, availableSlots)
+    list = this.selectFairCandidates(list, launchBudget)
     if (
       list.length > 0 &&
-      this.queue.length < maxVisible &&
+      launchBudget > 0 &&
       channel.checkAvailableTrack(list[0].mode)
     ) {
       // 提前更新轨道位置信息, 减少Bullet频繁读取容器dom信息
       channel.updatePos()
 
-      let tryCount = MAX_TRY_COUNT
-
-      for (let i = 0, item; i < Math.min(list.length, maxPerTick); i++) {
+      for (let i = 0, item; i < list.length; i++) {
         item = list[i]
         if (this.forceDuration && this.forceDuration !== item.duration) {
           item.duration = this.forceDuration
@@ -451,8 +594,8 @@ class Main extends BaseClass {
           if (result.result) {
             this.queue.push(bullet)
             bullet.topInit()
-
-            tryCount = MAX_TRY_COUNT
+            this.displayedComments.add(item)
+            this.lastBulletLaunch = Date.now()
           } else {
             bullet.detach()
             for (const k in bullet) {
@@ -469,18 +612,6 @@ class Main extends BaseClass {
                 this.data.push(item)
               }
             }
-
-            if (tryCount === 0) {
-              break
-            } else {
-              tryCount--
-            }
-          }
-        } else {
-          if (tryCount === 0) {
-            break
-          } else {
-            tryCount--
           }
         }
       }
@@ -531,7 +662,7 @@ class Main extends BaseClass {
       }
     } else if (config.dropStaleComments && player) {
       const currentTime = Math.floor(getPlayerCurrentTime(player) * 1000),
-        timePoint = currentTime - config.interval
+        timePoint = currentTime - config.interval * 2
 
       if (timePoint > 0) {
         for (let i = 0, comment; i < data.length; i++) {

@@ -102,7 +102,6 @@ export class DanmuJs extends BaseClass {
       dropStaleComments: true,
       channelSize: undefined,
       maxCommentsLength: undefined,
-      maxBulletsPerTick: 50,
       maxVisibleBullets: 200,
       bulletOffset: undefined,
       interval: 2000,
