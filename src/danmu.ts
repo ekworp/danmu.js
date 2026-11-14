@@ -77,7 +77,6 @@ export class DanmuJs extends BaseClass {
         ? config.container
         : null
     if (!this.container) {
-      // eslint-disable-next-line quotes
       this.emit('error', "container id can't be empty")
       return
     }

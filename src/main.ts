@@ -264,7 +264,6 @@ class Main extends BaseClass {
     this._status = 'playing'
     const channels = this.channel.channels
     if (channels && channels.length > 0) {
-      // eslint-disable-next-line no-extra-semi
       ;['scroll', 'top', 'bottom'].forEach((key) => {
         this.queue.forEach((item) => {
           item.startMove()

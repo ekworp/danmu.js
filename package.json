@@ -3,6 +3,19 @@
   "version": "1.2.1",
   "description": "HTML5 danmu (danmaku) plugin for any DOM element",
   "main": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./browser": "./browser/index.js"
+  },
+  "sideEffects": [
+    "**/*.scss"
+  ],
   "files": [
     "dist",
     "browser"
@@ -12,17 +25,20 @@
     "browser"
   ],
   "scripts": {
-    "prepare": "npm run build",
+    "prepare": "pnpm run build",
     "dev": "rslib build --watch",
-    "build": "rslib build",
+    "build": "rslib build && pnpm run build:types",
+    "build:types": "tsc -p tsconfig.build.json",
     "serve": "serve ./",
     "format": "biome format --write",
     "format:check": "biome format",
     "lint": "biome lint",
     "check": "biome check",
     "typecheck": "tsc --noEmit",
-    "release": "pnpm run check && pnpm run typecheck && pnpm run build && npm publish",
-    "release:rc": "npm run release --tag rc"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "release": "pnpm run check && pnpm run typecheck && pnpm run test && pnpm run build && pnpm publish",
+    "release:rc": "pnpm run release -- --tag rc"
   },
   "keywords": [
     "danmu",
@@ -38,16 +54,14 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.7",
-    "@rsbuild/plugin-sass": "^2.0.1",
     "@rslib/core": "^1.0.6",
     "css-loader": "^7.1.5",
-    "cz-conventional-changelog": "^3.3.0",
     "sass": "^1.108.2",
     "sass-loader": "^17.1.0",
     "serve": "^14.2.7",
     "style-loader": "^4.0.0",
     "typescript": "^7.0.2",
-    "yargs": "^18.2.0"
+    "vitest": "^5.1.0"
   },
   "repository": {
     "type": "git",

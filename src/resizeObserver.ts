@@ -18,7 +18,6 @@ class ResizeObserverWrapper {
           this.__trigger(entries)
         }, 100)
       )
-      // eslint-disable-next-line no-empty
     } catch (err) {}
   }
 

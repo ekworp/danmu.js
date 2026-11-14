@@ -1,7 +1,5 @@
-/* eslint-env node */
+import { copyFileSync, mkdirSync, readFileSync } from 'node:fs'
 import { defineConfig } from '@rslib/core'
-import { DefinePlugin } from '@rspack/core'
-import { copyFileSync, mkdirSync, readFileSync } from 'fs'
 
 // 直接读取 package.json 版本
 const packageJson = JSON.parse(readFileSync('./package.json', 'utf8'))
@@ -42,11 +40,7 @@ export default defineConfig({
           }
         ]
       },
-      plugins: [
-        new DefinePlugin({
-          __VERSION__: JSON.stringify(version)
-        })
-      ]
+      plugins: []
     }
   },
   plugins: [
@@ -74,7 +68,7 @@ export default defineConfig({
  * 使 UMD 文件兼容 Node.js 环境
  */
 async function makeUmdNodeCompatible() {
-  const fs = await import('fs')
+  const fs = await import('node:fs')
   const umdPath = './dist/index.js'
 
   let content = fs.readFileSync(umdPath, 'utf8')

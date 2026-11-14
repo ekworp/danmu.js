@@ -166,7 +166,10 @@ $ git clone git@github.com:bytedance/danmu.js.git
 $ cd danmu.js
 $ pnpm install
 $ pnpm run check
+$ pnpm run typecheck
+$ pnpm run test
 $ pnpm run build
+$ pnpm run build:types
 $ pnpm serve
 ```
 

@@ -106,7 +106,6 @@ class Channel extends BaseClass {
     }
     // bullet on track
     if (self.channels && self.channels.length > 0) {
-      // eslint-disable-next-line no-extra-semi
       ;['scroll', 'top', 'bottom'].forEach((key) => {
         for (let i = 0; i < self.channels.length; i++) {
           self.channels[i].queue[key].forEach((item) => {

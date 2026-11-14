@@ -79,7 +79,7 @@ export function findDom(
   } catch (e) {
     if (sel.startsWith('#')) {
       dom =
-        el instanceof Document
+        'getElementById' in el
           ? el.getElementById(sel.slice(1))
           : el.querySelector(sel)
     }
@@ -90,7 +90,8 @@ export function findDom(
 export function deepCopy(dst: Record<string, any>, src: Record<string, any>) {
   if (typeOf(src) === 'Object' && typeOf(dst) === 'Object') {
     Object.keys(src).forEach((key) => {
-      if (typeOf(src[key]) === 'Object' && !(src[key] instanceof Node)) {
+      const isDomNode = typeof Node !== 'undefined' && src[key] instanceof Node
+      if (typeOf(src[key]) === 'Object' && !isDomNode) {
         if (!dst[key]) {
           dst[key] = src[key]
         } else {
