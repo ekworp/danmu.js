@@ -180,8 +180,13 @@
           return textSeed[Math.floor(Math.random() * textSeed.length)]
         }).join('')
       }
-      const defaultComments = Array.from({ length: 1000 }, (_, index) => {
-        const start = (index * 60000) / 999
+      const defaultStarts = Array.from(
+        { length: 1000 },
+        () => Math.random() * 60000
+      ).sort((left, right) => left - right)
+      defaultStarts[0] = 0
+      defaultStarts[defaultStarts.length - 1] = 60000
+      const defaultComments = defaultStarts.map((start, index) => {
         return {
           id: `default-${index}`,
           start,
