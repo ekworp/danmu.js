@@ -79,6 +79,7 @@ export interface DanmuConfig {
   highScorePriority: boolean
   chaseEffect: boolean
   responsiveFontSize: boolean | { min?: number; max?: number }
+  syncPlaybackRate: boolean
   container?: HTMLElement
   containerStyle?: StyleMap
   player?: PlayerAdapter

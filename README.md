@@ -76,6 +76,7 @@
       dropStaleComments: true, // 丢弃视频当前时间之前的过期弹幕
       maxBulletsPerTick: 8, // 单次调度最多创建的弹幕数量
       maxVisibleBullets: 200, // 同时存在的最大弹幕数量
+      syncPlaybackRate: false, // 是否跟随播放器倍速调整弹幕速度
      chaseEffect: true, // 开启滚动弹幕追逐效果, 默认为true
      responsiveFontSize: {
        min: 12, // 可选，字体最小值(px)

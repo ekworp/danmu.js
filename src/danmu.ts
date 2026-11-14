@@ -109,6 +109,7 @@ export class DanmuJs extends BaseClass {
       highScorePriority: true, // 高积分优先展示
       chaseEffect: true, // 滚动弹幕追逐效果
       responsiveFontSize: false, // 根据容器主方向尺寸连续缩放普通弹幕字体
+      syncPlaybackRate: false,
       defaultOff: true
     })
     deepCopy(config, options)
@@ -324,7 +325,7 @@ export class DanmuJs extends BaseClass {
       }
     }
     const onRateChange = () => {
-      if (!this.main) return
+      if (!this.main || !this.config.syncPlaybackRate) return
       this.setPlayRate('scroll', getPlayerPlaybackRate(player))
     }
 
