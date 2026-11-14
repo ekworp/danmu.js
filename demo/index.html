@@ -1,393 +1,363 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
   <head>
-    <meta charset="utf-8" />
-    <title>danmu.js</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>danmu.js + Video.js</title>
+    <link
+      href="https://vjs.zencdn.net/8.23.4/video-js.css"
+      rel="stylesheet"
+    />
     <style>
-      html {
-        width: 100%;
-        height: 100%;
+      :root {
+        color-scheme: light;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
+
       body {
-        width: 100%;
-        height: 100%;
+        margin: 0;
+        padding: 24px;
+        background: #f5f6f8;
+        color: #1f2937;
       }
-      #wrap {
-        position: absolute;
-        left: 0;
-        width: 100%;
-        height: 337px;
+
+      .page {
+        width: min(960px, 100%);
+        margin: 0 auto;
       }
-      #vs {
+
+      .player-wrap {
+        position: relative;
+        overflow: hidden;
+        background: #000;
+      }
+
+      #danmu {
         position: absolute;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 9999;
+        inset: 0;
+        z-index: 2;
         pointer-events: none;
+        color: #000;
+        font-size: 16px;
       }
-      #vs > div {
+
+      #danmu > div {
         pointer-events: auto;
+        color: #000 !important;
+        -webkit-text-stroke: 0.75px rgb(255 255 255 / 75%);
+        paint-order: stroke fill;
+        text-shadow:
+          -1px -1px 0 rgb(255 255 255 / 75%),
+          1px -1px 0 rgb(255 255 255 / 75%),
+          -1px 1px 0 rgb(255 255 255 / 75%),
+          1px 1px 0 rgb(255 255 255 / 75%);
       }
-      #mse {
-        position: absolute;
-        left: 0;
-        width: 100%;
-        height: 100%;
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 16px;
       }
-      #btnwrap {
-        position: absolute;
-        right: 20px;
-        top: 400px;
+
+      .setting {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        margin-top: 10px;
+      }
+
+      input,
+      select {
+        min-width: 90px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        padding: 8px;
+        background: #fff;
+      }
+
+      button {
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        padding: 8px 12px;
+        background: #fff;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #f3f4f6;
+      }
+
+      #status {
+        margin-top: 12px;
+        color: #6b7280;
+        font-size: 14px;
       }
     </style>
   </head>
   <body>
-    <div id="wrap">
-      <div id="vs"></div>
-      <video id="mse" autoplay="true" muted playsinline controls loop>
-        <source src="//s1.pstatp.com/cdn/expire-1-M/byted-player-videos/1.0.0/xgplayer-demo.mp4" type="video/mp4" />
-        your browser does not support the video tag
-      </video>
-    </div>
-    <div id="btnwrap">
-      <div>
-        <button onclick="start()">弹幕开始</button>
-        <button onclick="stop()">弹幕结束</button>
-      </div>
-      <div>
-        <button onclick="pause()">弹幕暂停</button>
-        <button onclick="play()">弹幕播放</button>
-      </div>
-      <div>
-        <input type="text" id="opacity" placeholder="透明度" />
-        <button onclick="setOpacity()">改变透明度</button>
-      </div>
-      <div>
-        <input type="text" id="size" placeholder="改变大小" />
-        <button onclick="setFontSize()">改变大小</button>
+    <main class="page">
+      <h1>danmu.js + Video.js</h1>
+      <div class="player-wrap">
+        <video
+          id="videojs-player"
+          class="video-js vjs-default-skin"
+          controls
+          playsinline
+          preload="auto"
+          width="960"
+          height="540"
+        >
+          <source
+            src="//s1.pstatp.com/cdn/expire-1-M/byted-player-videos/1.0.0/xgplayer-demo.mp4"
+            type="video/mp4"
+          />
+          您的浏览器不支持 HTML5 视频播放。
+        </video>
+        <div id="danmu" aria-label="弹幕区域"></div>
       </div>
 
-      <div>
-        <input type="text" id="duration" placeholder="改变duration" />
-        <button onclick="setAllDuration()">改变duration</button>
+      <div class="controls">
+        <button type="button" id="danmu-start">开始弹幕</button>
+        <button type="button" id="danmu-pause">暂停弹幕</button>
+        <button type="button" id="danmu-play">继续弹幕</button>
+        <button type="button" id="danmu-stop">停止弹幕</button>
+        <button type="button" id="danmu-send">发送实时弹幕</button>
+        <button type="button" id="danmu-burst">发送 100 条弹幕</button>
       </div>
-      <div>
-        <label for="" name="设置弹幕区域">
-          <button onclick="setArea()">设置弹幕区域</button>
-          <input type="number" id="areaStart" placeholder="弹幕区域 - start" value="0" />
-          <input type="number" id="areaEnd" placeholder="弹幕区域 - end" value="0.5" />
-        </label>
-        <br />
-        <label>
-          <button onclick="setAreaLines()">设置弹幕区域(行数)</button>
-          <input type="number" id="areaLines" placeholder="弹幕区域 - 行数（lines）" value="1" />
-        </label>
+      <div class="setting">
+        <input id="comment-text" value="Video.js 实时弹幕" />
+        <button type="button" id="danmu-comment">发送弹幕</button>
+        <button type="button" id="danmu-prior">发送优先弹幕</button>
       </div>
-      <div>
-        <input type="text" id="comment" placeholder="输入弹幕内容" />
-        <button onclick="sendComment()">发送弹幕</button>
+      <div class="setting">
+        <input id="opacity" type="number" min="0" max="1" step="0.1" value="1" />
+        <button type="button" id="set-opacity">设置透明度</button>
+        <input id="font-size" type="number" min="10" max="64" value="16" />
+        <button type="button" id="set-font-size">设置字体大小</button>
+        <input id="duration" type="number" min="1000" value="10000" />
+        <button type="button" id="set-duration">设置滚动时长</button>
       </div>
-      <button onclick="sendPriorComment()">发送弹幕</button>
-    </div>
-    
+      <div class="setting">
+        <input id="area-start" type="number" min="0" max="1" step="0.05" value="0.02" />
+        <input id="area-end" type="number" min="0" max="1" step="0.05" value="0.98" />
+        <button type="button" id="set-area">设置弹幕区域</button>
+        <select id="hide-type">
+          <option value="scroll">滚动弹幕</option>
+          <option value="top">顶部弹幕</option>
+          <option value="bottom">底部弹幕</option>
+          <option value="color">彩色弹幕</option>
+        </select>
+        <button type="button" id="hide-danmu">隐藏</button>
+        <button type="button" id="show-danmu">显示</button>
+      </div>
+      <div id="status">正在初始化 Video.js…</div>
+    </main>
+
+    <script src="https://vjs.zencdn.net/8.23.4/video.min.js"></script>
     <script type="module">
       import DanmuJs from '../browser/index.mjs'
 
-      let wrap = document.getElementById('wrap')
-      let player = document.getElementById('mse')
-      let direction = 'r2l'
+      const status = document.querySelector('#status')
+      const container = document.querySelector('#danmu')
+      const videoElement = document.querySelector('#videojs-player')
+      const player = window.videojs(videoElement)
 
-      let like = document.createElement('span')
-      like.innerText = '10w+'
+      // Keep the danmu layer inside Video.js's fullscreen element.
+      player.el().appendChild(container)
 
-      let danmu = new DanmuJs({
-        needResizeObserver: true,
-        channelSize: 24,
-        container: document.getElementById('vs'),
-        containerStyle: {
-          zIndex: 100
-        },
-        player: player,
-        mouseControl: true, // 打开鼠标控制, 打开后可监听到 bullet_hover 事件。danmu.on('bullet_hover', function (data) {})
-        mouseControlPause: true, // 鼠标触摸暂停。mouseControl: true 生效
-        area: {
-          start: 0,
-          end: 1
-        },
-        disableCopyDOM: true,
-        dropStaleComments: true
-      })
-
-      danmu.on('bullet_hover', (e) => {
-        console.log(e)
-        danmu.freezeComment(e.bullet.id)
-
-        setTimeout(function () {
-          danmu.restartComment(e.bullet.id)
-        }, 4000)
-      })
-
-      start()
-
-      let id = 1
-      function start() {
-        if (danmu) {
-          danmu.start()
+      const formatTimestamp = (milliseconds) => {
+        const totalSeconds = Math.floor(milliseconds / 1000)
+        const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0')
+        const seconds = String(totalSeconds % 60).padStart(2, '0')
+        return `${minutes}:${seconds}`
+      }
+      const textSeed = '弹幕测试视频播放效果观察滚动全屏暂停继续随机文字'
+      const randomText = () => {
+        const length = 4 + Math.floor(Math.random() * 12)
+        return Array.from({ length }, () => {
+          return textSeed[Math.floor(Math.random() * textSeed.length)]
+        }).join('')
+      }
+      const defaultStarts = Array.from(
+        { length: 1000 },
+        () => Math.random() * 60000
+      ).sort((left, right) => left - right)
+      defaultStarts[0] = 0
+      defaultStarts[defaultStarts.length - 1] = 60000
+      const defaultComments = defaultStarts.map((start, index) => {
+        return {
+          id: `default-${index}`,
+          start,
+          duration: 9000,
+          txt: `${formatTimestamp(start)} ${randomText()}`
         }
+      })
 
-        setInterval(function () {
-          // console.log(player.currentTime+1)
-          let currentTime = player.currentTime
-          let txt = '哈哈哈哈哈哈哈哈哈66' + id
-          let el = document.createElement('div')
+      const danmu = new DanmuJs({
+        container,
+        player: videoElement,
+        needResizeObserver: true,
+        channelSize: 20,
+        responsiveFontSize: true,
+        defaultOff: true,
+        maxVisibleBullets: 20,
+        mouseControl: true,
+        mouseControlPause: true,
+        dropStaleComments: true,
+        area: {
+          start: 0.02,
+          end: 0.98
+        },
+        comments: defaultComments
+      })
 
-          el.textContent = txt
+      let nextId = 1
+      let danmuStarted = false
 
-          id++
-          // console.log('sendComment: ', id);
+      function updateStatus(message) {
+        status.textContent = `${message} · ${player.currentTime().toFixed(1)}s`
+      }
+
+      danmu.on('ready', () => updateStatus('danmu.js 已就绪'))
+      danmu.on('bullet_start', () => updateStatus('弹幕播放中'))
+      danmu.on('bullet_hover', ({ bullet }) => {
+        console.log('hover bullet:', bullet)
+        danmu.freezeComment(bullet.id)
+        window.setTimeout(() => danmu.restartComment(bullet.id), 4000)
+      })
+
+      document.querySelector('#danmu-start').addEventListener('click', () => {
+        danmu.start()
+        danmuStarted = true
+        updateStatus('弹幕已开始')
+      })
+      document.querySelector('#danmu-pause').addEventListener('click', () => {
+        danmu.pause()
+        updateStatus('弹幕已暂停')
+      })
+      document.querySelector('#danmu-play').addEventListener('click', () => {
+        danmu.play()
+        updateStatus('弹幕已继续')
+      })
+      document.querySelector('#danmu-stop').addEventListener('click', () => {
+        danmu.stop()
+        updateStatus('弹幕已停止')
+      })
+      document.querySelector('#danmu-send').addEventListener('click', () => {
+        const id = `realtime-${nextId++}`
+        danmu.sendComment({
+          id,
+          start: player.currentTime() * 1000,
+          duration: 8000,
+          realTime: true,
+          txt: `实时弹幕 ${id}`,
+          style: {
+            color: '#000'
+          }
+        })
+        updateStatus('已发送实时弹幕')
+      })
+      document.querySelector('#danmu-burst').addEventListener('click', () => {
+        const start = player.currentTime() * 1000
+        const textSeed = '批量弹幕测试海浪风景视频ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        for (let index = 0; index < 100; index++) {
+          const length = 6 + Math.floor(Math.random() * 30)
+          const text = Array.from({ length }, (_, charIndex) => {
+            return textSeed[(index + charIndex) % textSeed.length]
+          }).join('')
+
           danmu.sendComment({
+            id: `burst-${nextId++}`,
+            // Spread the burst over 30 seconds instead of displaying all
+            // comments in the same scheduler tick.
+            start: start + index * 300,
             duration: 10000,
-            id: '' + id,
-            // prior: id % 20 === 0,
-            //   realTime: true,
-            // txt,
-            start: player.currentTime * 1000,
-            el,
-            disableCopyDOM: true,
-            // realTime: true,
-            // start: 1000*currentTime,
-            // txt: '哈哈哈哈哈哈哈哈哈123' + id, //弹幕文字内容
+            txt: text,
             style: {
-              color: id % 20 === 0 ? '#f00' : '#000',
-              fontSize: '32px'
-              //   // padding: '5px 12px',
-              //   fontSize: '25px',
-              //   lineHeight: 1.125
-              // border
+              color: '#000'
             }
           })
-        }, 500)
-      }
-
-      function play() {
-        danmu.play()
-      }
-
-      function pause() {
-        danmu.pause()
-      }
-
-      function stop() {
-        danmu.stop()
-      }
-
-      function sendComment() {
-        id++
-        let el = createDom('xg-el', '弹幕弹幕弹幕<img src="./grinning-face.png" />弹幕弹幕', {}, 'xgplayer-el')
-
-        danmu.sendComment({
-          duration: 15000,
-          id: id,
-          // prior: true,
-          // realTime: true,
-          // noDiscard: true,
-          // prior: true,
-          // realTime: true,
-          start: 1000 * player.currentTime,
-          // txt: id + comment,
-          el: el
-        })
-      }
-
-      function sendPriorComment() {
-        danmu.sendComment({
-          //发送弹幕
-          duration: 5000,
-          id: id++,
-          start: 1000 * player.currentTime,
-          txt: '哈哈哈哈哈哈哈哈哈哈哈哈-------哈哈哈哈哈哈哈哈哈哈哈哈哈哈', //弹幕文字内容
-          style: {
-            fontSize: '20px',
-            lineHeight: 1.125,
-            border: 'solid 1px #f00'
-          },
-          prior: true,
-          realTime: true,
-          noDiscard: true
-        })
-      }
-
-      function setOpacity() {
-        let opacity = document.getElementById('opacity').value
-        danmu.setOpacity(opacity)
-      }
-      function setFontSize() {
-        let size = document.getElementById('size').value
-        danmu.setFontSize(size, (size * 41) / 25)
-      }
-
-      function setAllDuration() {
-        let duration = document.getElementById('duration').value
-        danmu.setAllDuration(duration)
-      }
-
-      function setArea() {
-        let start = document.querySelector('#areaStart').value
-        let end = document.querySelector('#areaEnd').value
-        danmu.setArea({
-          start: parseFloat(start),
-          end: parseFloat(end)
-        })
-      }
-
-      function setAreaLines() {
-        let lines = document.querySelector('#areaLines').value
-        danmu.setArea({
-          lines: parseInt(lines)
-        })
-      }
-
-      function setCommentLike() {
-        let id = document.getElementById('commentid').value
-        danmu.setCommentLike(id, {
-          el: like,
-          style: {
-            paddingLeft: '10px',
-            color: '#ff0000'
-          }
-        })
-      }
-
-      function setCommentDuration() {
-        let id = document.getElementById('commentid').value
-        let duration = document.getElementById('duration').value
-        danmu.setCommentDuration(id, duration)
-      }
-
-      function setAllDuration() {
-        let duration = document.getElementById('duration').value
-        danmu.setAllDuration('scroll', duration)
-      }
-
-      function hide() {
-        let type = document.getElementById('hidetype').value
-        danmu.hide(type)
-        console.log(type)
-      }
-
-      function show() {
-        let type = document.getElementById('hidetype').value
-        danmu.show(type)
-      }
-
-      function setCommentID() {
-        let id = document.getElementById('commentid').value
-        let newid = document.getElementById('commentnewid').value
-        danmu.setCommentID(id, newid)
-      }
-
-      let getFullscreen = function (el) {
-        if (el.requestFullscreen) {
-          el.requestFullscreen()
-        } else if (el.mozRequestFullScreen) {
-          el.mozRequestFullScreen()
-        } else if (el.webkitRequestFullscreen) {
-          el.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT)
-        } else if (player.webkitSupportsFullscreen) {
-          player.webkitEnterFullscreen()
-        } else if (el.msRequestFullscreen) {
-          el.msRequestFullscreen()
         }
-      }
-      let exitFullscreen = function () {
-        if (document.exitFullscreen) {
-          document.exitFullscreen()
-        } else if (document.webkitExitFullscreen) {
-          document.webkitExitFullscreen()
-        } else if (document.mozCancelFullScreen) {
-          document.mozCancelFullScreen()
-        } else if (document.msExitFullscreen) {
-          document.msExitFullscreen()
-        }
-      }
-
-      let isFullscreen = false
-      function toggleFullscreen() {
-        if (isFullscreen) {
-          exitFullscreen()
-        } else {
-          getFullscreen(wrap)
-        }
-        isFullscreen = !isFullscreen
-      }
-
-      function toggleDirection() {
-        danmu.stop()
-        if (direction === 'r2l') {
-          danmu.setDirection('b2t')
-          direction = 'b2t'
-        } else {
-          danmu.setDirection('r2l')
-          direction = 'r2l'
-        }
-        danmu.start()
-      }
-
-      let area = 1
-      function toggleArea() {
-        if (area === 1) {
-          area = 2
-        } else if (area === 2) {
-          area = 3
-        } else if (area === 3) {
-          area = 4
-        } else if (area === 4) {
-          area = 1
-        }
-        danmu.config.area.end = (5 - area) / 4
-        danmu.bulletBtn.main.channel.resetArea()
-      }
-
-      function createDom(el = 'div', tpl = '', attrs = {}, cname = '') {
-        let dom = document.createElement(el)
-        dom.className = cname
-        dom.innerHTML = tpl
-        Object.keys(attrs).forEach((item) => {
-          let key = item
-          let value = attrs[item]
-          if (el === 'video' || el === 'audio') {
-            if (value) {
-              dom.setAttribute(key, value)
-            }
-          } else {
-            dom.setAttribute(key, value)
-          }
-        })
-        return dom
-      }
-
-      Object.assign(window, {
-        start,
-        stop,
-        pause,
-        play,
-        sendComment,
-        sendPriorComment,
-        setOpacity,
-        setFontSize,
-        setAllDuration,
-        setArea,
-        setAreaLines,
-        setCommentLike,
-        setCommentDuration,
-        hide,
-        show,
-        setCommentID,
-        toggleFullscreen,
-        toggleDirection,
-        toggleArea
+        updateStatus('已发送 100 条弹幕')
       })
+      document.querySelector('#danmu-comment').addEventListener('click', () => {
+        const id = `comment-${nextId++}`
+        danmu.sendComment({
+          id,
+          start: player.currentTime() * 1000,
+          duration: 8000,
+          realTime: true,
+          txt: document.querySelector('#comment-text').value || '实时弹幕',
+          style: {
+            color: '#000'
+          }
+        })
+        updateStatus('已发送弹幕')
+      })
+      document.querySelector('#danmu-prior').addEventListener('click', () => {
+        const id = `prior-${nextId++}`
+        danmu.sendComment({
+          id,
+          start: player.currentTime() * 1000,
+          duration: 5000,
+          realTime: true,
+          prior: true,
+          noDiscard: true,
+          txt: '优先弹幕：Video.js 测试',
+          style: {
+            color: '#000',
+            border: '1px solid #f00'
+          }
+        })
+        updateStatus('已发送优先弹幕')
+      })
+      document.querySelector('#set-opacity').addEventListener('click', () => {
+        danmu.setOpacity(document.querySelector('#opacity').value)
+        updateStatus('已更新透明度')
+      })
+      document.querySelector('#set-font-size').addEventListener('click', () => {
+        const size = Number(document.querySelector('#font-size').value)
+        if (Number.isFinite(size) && size > 0) {
+          danmu.setFontSize(size, size + 4)
+          updateStatus('已更新字体大小')
+        }
+      })
+      document.querySelector('#set-duration').addEventListener('click', () => {
+        const duration = Number(document.querySelector('#duration').value)
+        if (Number.isFinite(duration) && duration > 0) {
+          danmu.setAllDuration('scroll', duration)
+          updateStatus('已更新滚动时长')
+        }
+      })
+      document.querySelector('#set-area').addEventListener('click', () => {
+        const start = Number(document.querySelector('#area-start').value)
+        const end = Number(document.querySelector('#area-end').value)
+        if (Number.isFinite(start) && Number.isFinite(end) && end >= start) {
+          danmu.setArea({ start, end })
+          updateStatus('已更新弹幕区域')
+        }
+      })
+      document.querySelector('#hide-danmu').addEventListener('click', () => {
+        danmu.hide(document.querySelector('#hide-type').value)
+        updateStatus('已隐藏弹幕类型')
+      })
+      document.querySelector('#show-danmu').addEventListener('click', () => {
+        danmu.show(document.querySelector('#hide-type').value)
+        updateStatus('已显示弹幕类型')
+      })
+
+      player.on('play', () => {
+        if (!danmuStarted) {
+          danmu.start()
+          danmuStarted = true
+        } else {
+          danmu.play()
+        }
+      })
+      player.on('pause', () => danmu.pause())
+      player.on('ended', () => danmu.stop())
     </script>
   </body>
 </html>
