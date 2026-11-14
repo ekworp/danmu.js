@@ -1,6 +1,11 @@
 export const hasOwnProperty = Object.prototype.hasOwnProperty
 
-export function createDom(el = 'div', tpl = '', attrs = {}, cname = '') {
+export function createDom(
+  el = 'div',
+  tpl = '',
+  attrs: Record<string, string | number | boolean> = {},
+  cname = ''
+): HTMLElement {
   const dom = document.createElement(el)
   dom.className = cname
   dom.innerHTML = tpl
@@ -9,16 +14,16 @@ export function createDom(el = 'div', tpl = '', attrs = {}, cname = '') {
     const value = attrs[item]
     if (el === 'video' || el === 'audio') {
       if (value) {
-        dom.setAttribute(key, value)
+        dom.setAttribute(key, String(value))
       }
     } else {
-      dom.setAttribute(key, value)
+      dom.setAttribute(key, String(value))
     }
   })
   return dom
 }
 
-export function hasClass(el, className) {
+export function hasClass(el: HTMLElement, className: string): boolean {
   if (el.classList) {
     return Array.prototype.some.call(el.classList, (item) => item === className)
   } else {
@@ -26,7 +31,7 @@ export function hasClass(el, className) {
   }
 }
 
-export function addClass(el, className) {
+export function addClass(el: HTMLElement, className: string): void {
   if (el.classList) {
     className
       .replace(/(^\s+|\s+$)/g, '')
@@ -39,7 +44,7 @@ export function addClass(el, className) {
   }
 }
 
-export function removeClass(el, className) {
+export function removeClass(el: HTMLElement, className: string): void {
   if (el.classList) {
     className.split(/\s+/g).forEach((item) => {
       el.classList.remove(item)
@@ -52,7 +57,7 @@ export function removeClass(el, className) {
   }
 }
 
-export function toggleClass(el, className) {
+export function toggleClass(el: HTMLElement, className: string): void {
   className.split(/\s+/g).forEach((item) => {
     if (hasClass(el, item)) {
       removeClass(el, item)
@@ -62,21 +67,27 @@ export function toggleClass(el, className) {
   })
 }
 
-export function findDom(el = document, sel) {
-  let dom
+export function findDom(
+  el: Document | HTMLElement = document,
+  sel = ''
+): Element | null {
+  let dom: Element | null = null
   // fix querySelector IDs that start with a digit
   // https://stackoverflow.com/questions/37270787/uncaught-syntaxerror-failed-to-execute-queryselector-on-document
   try {
     dom = el.querySelector(sel)
   } catch (e) {
     if (sel.startsWith('#')) {
-      dom = el.getElementById(sel.slice(1))
+      dom =
+        el instanceof Document
+          ? el.getElementById(sel.slice(1))
+          : el.querySelector(sel)
     }
   }
   return dom
 }
 
-export function deepCopy(dst, src) {
+export function deepCopy(dst: Record<string, any>, src: Record<string, any>) {
   if (typeOf(src) === 'Object' && typeOf(dst) === 'Object') {
     Object.keys(src).forEach((key) => {
       if (typeOf(src[key]) === 'Object' && !(src[key] instanceof Node)) {
@@ -96,11 +107,11 @@ export function deepCopy(dst, src) {
   }
 }
 
-export function typeOf(obj) {
+export function typeOf(obj: unknown): string | undefined {
   return Object.prototype.toString.call(obj).match(/([^\s.*]+)(?=]$)/g)?.[0]
 }
 
-export function copyDom(dom) {
+export function copyDom(dom: HTMLElement): HTMLElement | string {
   if (dom && dom.nodeType === 1) {
     const back = document.createElement(dom.tagName)
     Array.prototype.forEach.call(dom.attributes, (node) => {
@@ -123,7 +134,12 @@ function offInDestroy(object, event, fn, offEvent) {
   object.once(offEvent, onDestroy)
 }
 
-export function attachEventListener(object, event, fn, offEvent) {
+export function attachEventListener(
+  object: any,
+  event: string,
+  fn: (data?: any) => void,
+  offEvent?: string
+): void {
   if (offEvent) {
     object.on(event, fn)
     offInDestroy(object, event, fn, offEvent)
@@ -141,12 +157,16 @@ export function attachEventListener(object, event, fn, offEvent) {
  * @param {string} name
  * @param {string} value
  */
-export function styleUtil(elem, name, value) {
+export function styleUtil(
+  elem: HTMLElement,
+  name: string,
+  value: string | number
+): void {
   const style = elem.style
   try {
-    style[name] = value
+    ;(style as any)[name] = value
   } catch (error) {
-    style.setProperty(name, value)
+    style.setProperty(name, String(value))
   }
 }
 
@@ -154,18 +174,18 @@ export function styleUtil(elem, name, value) {
  * @param {HTMLElement} elem
  * @param {string} value
  */
-export function styleCSSText(elem, value) {
+export function styleCSSText(elem: HTMLElement, value: string): void {
   const style = elem.style
   try {
     style.cssText = value
   } catch (error) {}
 }
 
-export function isNumber(val) {
+export function isNumber(val: unknown): val is number {
   return typeof val === 'number' && !Number.isNaN(val)
 }
 
-export function isFunction(val) {
+export function isFunction(val: unknown): val is (...args: any[]) => any {
   return typeof val === 'function'
 }
 
@@ -175,7 +195,10 @@ export function isFunction(val) {
  * @param {number} wait
  * @returns
  */
-export function throttle(func, wait) {
+export function throttle(
+  func: (...args: any[]) => void,
+  wait: number
+): (...args: any[]) => void {
   let timer = 0
   return (...args) => {
     clearTimeout(timer)

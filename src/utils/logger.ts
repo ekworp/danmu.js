@@ -5,10 +5,10 @@ const DEBUG =
 class Logger {
   [key: string]: any
 
-  constructor(constructorName) {
+  constructor(constructorName = '') {
     this.constructorName = constructorName || ''
   }
-  info(message, ...optionalParams) {
+  info(message: unknown, ...optionalParams: unknown[]): void {
     DEBUG &&
       console.log(
         `[Danmu Log][${this.constructorName}]`,

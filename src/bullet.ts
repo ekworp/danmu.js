@@ -158,7 +158,11 @@ export class Bullet extends BaseClass {
         if (options.el.nodeType === 1 && !options.el.parentNode) {
           if (this.reuseDOM) {
             const copyDOM = copyDom(options.el)
-            if (options.eventListeners && options.eventListeners.length > 0) {
+            if (
+              copyDOM instanceof HTMLElement &&
+              options.eventListeners &&
+              options.eventListeners.length > 0
+            ) {
               options.eventListeners.forEach((eventListener) => {
                 copyDOM.addEventListener(
                   eventListener.event,
