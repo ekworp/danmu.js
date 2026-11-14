@@ -167,34 +167,28 @@
       // Keep the danmu layer inside Video.js's fullscreen element.
       player.el().appendChild(container)
 
-      const defaultComments = [
-        '视频开始',
-        'Video.js 弹幕测试',
-        'danmu.js 正在播放',
-        '观察弹幕滚动效果',
-        '支持全屏播放',
-        '支持暂停和继续',
-        '弹幕轨道自动分配',
-        '窗口变化会重新排版',
-        '字体大小可以响应式调整',
-        '正在进行播放同步',
-        '中途可以拖动进度条',
-        '弹幕时间跟随视频',
-        '支持实时发送弹幕',
-        '也可以发送优先弹幕',
-        '下面测试更长的弹幕内容',
-        'Video.js 原生视频适配',
-        '弹幕容器位于播放器内部',
-        '全屏退出后仍保持显示',
-        '继续观察滚动是否平滑',
-        '默认序列即将结束',
-        '视频播放到 60 秒'
-      ].map((txt, index) => ({
-        id: `default-${index}`,
-        start: index * 3000,
-        duration: 9000,
-        txt
-      }))
+      const formatTimestamp = (milliseconds) => {
+        const totalSeconds = Math.floor(milliseconds / 1000)
+        const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0')
+        const seconds = String(totalSeconds % 60).padStart(2, '0')
+        return `${minutes}:${seconds}`
+      }
+      const textSeed = '弹幕测试视频播放效果观察滚动全屏暂停继续随机文字'
+      const randomText = () => {
+        const length = 4 + Math.floor(Math.random() * 12)
+        return Array.from({ length }, () => {
+          return textSeed[Math.floor(Math.random() * textSeed.length)]
+        }).join('')
+      }
+      const defaultComments = Array.from({ length: 1000 }, (_, index) => {
+        const start = (index * 60000) / 999
+        return {
+          id: `default-${index}`,
+          start,
+          duration: 9000,
+          txt: `${formatTimestamp(start)} ${randomText()}`
+        }
+      })
 
       const danmu = new DanmuJs({
         container,
