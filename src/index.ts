@@ -6,6 +6,9 @@ export type {
   CommentMode,
   DanmuConfig,
   DanmuConfigOptions,
+  DanmuEventHandler,
+  DanmuEventMap,
+  DanmuEventName,
   GlobalHooks,
   LikeData,
   PlayerAdapter

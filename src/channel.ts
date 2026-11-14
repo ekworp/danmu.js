@@ -430,9 +430,9 @@ class Channel extends BaseClass {
           // 找到应该被删的 danmu
           let start = 0
           let deleteIndex = -1
-          let deleteItem: any = null
+          let deleteItem: Bullet | null = null
           this.danmu.bulletBtn.main.queue.forEach(
-            (item: any, index: number) => {
+            (item: Bullet, index: number) => {
               if (
                 !item.prior &&
                 !item.options.realTime &&
@@ -447,14 +447,15 @@ class Channel extends BaseClass {
               }
             }
           )
-          if (deleteItem) {
-            deleteItem.remove()
-            this.removeBullet(deleteItem)
+          const itemToDelete = deleteItem as Bullet | null
+          if (itemToDelete) {
+            itemToDelete.remove()
+            this.removeBullet(itemToDelete)
             this.danmu.bulletBtn.main.queue.splice(deleteIndex, 1)
-            bullet.channel_id = deleteItem.channel_id
+            bullet.channel_id = itemToDelete.channel_id
             for (
-              let i = deleteItem.channel_id[0],
-                max = deleteItem.channel_id[0] + deleteItem.channel_id[1];
+              let i = itemToDelete.channel_id[0],
+                max = itemToDelete.channel_id[0] + itemToDelete.channel_id[1];
               i < max;
               i++
             ) {
@@ -466,7 +467,7 @@ class Channel extends BaseClass {
               }
               channel.operating[bullet.mode] = false
             }
-            bullet.top = deleteItem.top
+            bullet.top = itemToDelete.top
             if (this.danmu.config.area && this.danmu.config.area.start) {
               bullet.top += this.containerHeight * this.danmu.config.area.start
             }
@@ -504,7 +505,7 @@ class Channel extends BaseClass {
               const nextAddTime = 2
               if (danmu.player) {
                 const dataList = danmu.bulletBtn.main.data
-                dataList.some((item: any) => {
+                dataList.some((item: CommentData) => {
                   if (item.id === bullet.id) {
                     this.logger &&
                       this.logger.info(
@@ -530,7 +531,7 @@ class Channel extends BaseClass {
             const nextAddTime = 2
             if (danmu.player) {
               const dataList = danmu.bulletBtn.main.data
-              dataList.some((item: any) => {
+              dataList.some((item: CommentData) => {
                 if (item.id === bullet.id) {
                   this.logger &&
                     this.logger.info(

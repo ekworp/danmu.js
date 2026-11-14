@@ -81,7 +81,27 @@ export interface DanmuConfig {
   bOffset?: number
 }
 
-export type DanmuConfigOptions = Partial<DanmuConfig>
+export type DanmuConfigOptions = Omit<
+  Partial<DanmuConfig>,
+  'area' | 'responsiveFontSize'
+> & {
+  area?: Partial<DanmuConfig['area']>
+  responsiveFontSize?: DanmuConfig['responsiveFontSize']
+}
+
+export interface DanmuEventMap {
+  ready: undefined
+  error: string
+  destroy: undefined
+  bullet_remove: { bullet: unknown }
+  bullet_hover: { bullet: unknown; event: MouseEvent }
+  channel_resize: undefined
+  changeDirection: DanmuConfig['direction']
+}
+
+export type DanmuEventName = keyof DanmuEventMap
+
+export type DanmuEventHandler<T> = (data: T) => void
 
 export interface PlayerAdapter {
   currentTime?: number
@@ -91,14 +111,6 @@ export interface PlayerAdapter {
 
 /* Internal classes deliberately expose dynamic state while they are being
  * migrated away from the legacy JavaScript implementation. */
-export interface RuntimeConfig extends DanmuConfig {
-  player?: {
-    currentTime?: number
-    addEventListener?: (event: string, handler: EventListener) => void
-    removeEventListener?: (event: string, handler: EventListener) => void
-  }
-}
-
 class BaseClass {
   [key: string]: any
   logger!: Log

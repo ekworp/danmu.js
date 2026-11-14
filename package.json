@@ -32,6 +32,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "bench": "node scripts/bench.mjs",
     "release": "pnpm run check && pnpm run typecheck && pnpm run test && pnpm run build && pnpm publish",
     "release:rc": "pnpm run release -- --tag rc"
   },

@@ -9,6 +9,21 @@ import { hasOwnProperty } from './utils/util'
 // 单次尝试入轨弹幕数量越多，长任务及CPU耗时越多
 const MAX_TRY_COUNT = 0
 
+interface EventBindingTarget {
+  addEventListener?: (
+    event: string,
+    handler: EventListener,
+    options?: boolean
+  ) => void
+  removeEventListener?: (
+    event: string,
+    handler: EventListener,
+    options?: boolean
+  ) => void
+  on?: (event: string, handler: (...args: never[]) => void) => void
+  off?: (event: string, handler: (...args: never[]) => void) => void
+}
+
 /**
  * @typedef {import('./baseClass').CommentData} CommentData
  */
@@ -156,11 +171,16 @@ class Main extends BaseClass {
       this._events.push([container, 'mouseover', onMouseover])
     }
 
-    this._events.forEach((item: any) => {
-      if (item[0].addEventListener) {
-        item[0].addEventListener(item[1], item[2], false)
-      } else if (item[0].on) {
-        item[0].on(item[1], item[2])
+    this._events.forEach((item: unknown) => {
+      const [target, event, handler] = item as [
+        EventBindingTarget,
+        string,
+        EventListener
+      ]
+      if (target.addEventListener) {
+        target.addEventListener(event, handler, false)
+      } else if (target.on) {
+        target.on(event, handler as (...args: never[]) => void)
       }
     })
   }
@@ -170,11 +190,16 @@ class Main extends BaseClass {
    */
   _unbindEvents() {
     if (this._events.length) {
-      this._events.forEach((item: any) => {
-        if (item[0].removeEventListener) {
-          item[0].removeEventListener(item[1], item[2], false)
-        } else if (item[0].off) {
-          item[0].off(item[1], item[2])
+      this._events.forEach((item: unknown) => {
+        const [target, event, handler] = item as [
+          EventBindingTarget,
+          string,
+          EventListener
+        ]
+        if (target.removeEventListener) {
+          target.removeEventListener(event, handler, false)
+        } else if (target.off) {
+          target.off(event, handler as (...args: never[]) => void)
         }
       })
       this._events = []
@@ -419,7 +444,7 @@ class Main extends BaseClass {
   keepPoolWatermark() {
     const { config, player } = this.danmu
     const { data } = this
-    const priorComments: any[] = []
+    const priorComments: CommentData[] = []
     let deleteCount = 0
 
     // Support data pool to control watermark automatically

@@ -4,6 +4,9 @@ import type {
   CommentMode,
   DanmuConfig,
   DanmuConfigOptions,
+  DanmuEventHandler,
+  DanmuEventMap,
+  DanmuEventName,
   GlobalHooks
 } from './baseClass'
 import BaseClass from './baseClass'
@@ -21,6 +24,19 @@ import { addClass, deepCopy, isNumber, styleUtil } from './utils/util'
  */
 
 export class DanmuJs extends BaseClass {
+  declare on: <K extends DanmuEventName>(
+    event: K,
+    handler: DanmuEventHandler<DanmuEventMap[K]>
+  ) => this
+  declare once: <K extends DanmuEventName>(
+    event: K,
+    handler: DanmuEventHandler<DanmuEventMap[K]>
+  ) => this
+  declare off: <K extends DanmuEventName>(
+    event: K,
+    handler: DanmuEventHandler<DanmuEventMap[K]>
+  ) => this
+
   constructor(options: DanmuConfigOptions = {}) {
     super()
 

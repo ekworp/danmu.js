@@ -1,7 +1,10 @@
 import { hasOwnProperty, styleUtil } from './utils/util'
 
 export default class RecyclableDOMList {
-  [key: string]: any
+  idleList!: HTMLElement[]
+  usingList!: HTMLElement[]
+  private _id = 0
+  private options!: Required<RecycleOptions>
 
   constructor(options: RecycleOptions = {}) {
     const resolvedOptions: Required<RecycleOptions> = {
@@ -25,6 +28,9 @@ export default class RecyclableDOMList {
       this._expand(1)
     }
     const firseIdle = this.idleList.shift()
+    if (!firseIdle) {
+      throw new Error('DOM pool failed to allocate an element')
+    }
     this.usingList.push(firseIdle)
     return firseIdle
   }
@@ -48,12 +54,12 @@ export default class RecyclableDOMList {
   destroy() {
     for (let i = 0; i < this.idleList.length; i++) {
       this.idleList[i].innerHTML = ''
-      this.idleList[i].textcontent = ''
+      this.idleList[i].textContent = ''
       this.clearElementStyle(this.idleList[i])
     }
     for (let i = 0; i < this.usingList.length; i++) {
       this.usingList[i].innerHTML = ''
-      this.usingList[i].textcontent = ''
+      this.usingList[i].textContent = ''
       this.clearElementStyle(this.usingList[i])
     }
     for (const k in this) {
