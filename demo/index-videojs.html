@@ -130,6 +130,7 @@
         needResizeObserver: true,
         channelSize: 20,
         responsiveFontSize: true,
+        defaultOff: true,
         area: {
           start: 0.02,
           end: 0.98
@@ -143,6 +144,7 @@
       })
 
       let nextId = 1
+      let danmuStarted = false
 
       function updateStatus(message) {
         status.textContent = `${message} · ${player.currentTime().toFixed(1)}s`
@@ -156,6 +158,7 @@
 
       document.querySelector('#danmu-start').addEventListener('click', () => {
         danmu.start()
+        danmuStarted = true
         updateStatus('弹幕已开始')
       })
       document.querySelector('#danmu-pause').addEventListener('click', () => {
@@ -208,11 +211,16 @@
         updateStatus('已发送 100 条弹幕')
       })
 
-      player.on('play', () => danmu.play())
+      player.on('play', () => {
+        if (!danmuStarted) {
+          danmu.start()
+          danmuStarted = true
+        } else {
+          danmu.play()
+        }
+      })
       player.on('pause', () => danmu.pause())
       player.on('ended', () => danmu.stop())
-
-      danmu.start()
     </script>
   </body>
 </html>

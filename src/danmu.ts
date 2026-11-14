@@ -101,7 +101,8 @@ export class DanmuJs extends BaseClass {
       interval: 2000,
       highScorePriority: true, // 高积分优先展示
       chaseEffect: true, // 滚动弹幕追逐效果
-      responsiveFontSize: false // 根据容器主方向尺寸连续缩放普通弹幕字体
+      responsiveFontSize: false, // 根据容器主方向尺寸连续缩放普通弹幕字体
+      defaultOff: true
     })
     deepCopy(config, options)
 
@@ -300,6 +301,8 @@ export class DanmuJs extends BaseClass {
       if (this._playerWaiting) {
         this._playerWaiting = false
         this.play()
+      } else if (this.config.defaultOff && this.status === 'idle') {
+        this.start()
       }
     }
     const onPause = () => {
