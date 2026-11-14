@@ -328,6 +328,11 @@ export class DanmuJs extends BaseClass {
       if (!this.main || !this.config.syncPlaybackRate) return
       this.setPlayRate('scroll', getPlayerPlaybackRate(player))
     }
+    const onTimeUpdate = () => {
+      if (this.main?.status === 'playing') {
+        this.main.requestTick()
+      }
+    }
 
     this._playerEvents = [
       ['waiting', onWaiting],
@@ -335,7 +340,8 @@ export class DanmuJs extends BaseClass {
       ['pause', onPause],
       ['seeking', onSeeking],
       ['seeked', onSeeking],
-      ['ratechange', onRateChange]
+      ['ratechange', onRateChange],
+      ['timeupdate', onTimeUpdate]
     ]
     this._playerEvents.forEach(([event, handler]: [string, EventListener]) => {
       addPlayerListener(player, event, handler)
