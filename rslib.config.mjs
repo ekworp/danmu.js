@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync, readFileSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { defineConfig } from '@rslib/core'
 
 // 直接读取 package.json 版本
@@ -8,14 +8,36 @@ const version = packageJson.version
 export default defineConfig({
   lib: [
     {
+      format: 'esm',
+      output: {
+        distPath: './dist',
+        filename: {
+          js: 'index.mjs'
+        }
+      }
+    },
+    {
       format: 'cjs',
-      fileName: 'index.cjs'
+      output: {
+        distPath: './dist',
+        filename: {
+          js: 'index.cjs'
+        }
+      }
     },
     {
       format: 'umd',
-      name: 'DanmuJs',
+      umdName: 'DanmuJs',
       bundle: true,
-      syntax: 'es5'
+      syntax: 'es5',
+      output: {
+        target: 'web',
+        distPath: './browser',
+        globalObject: 'globalThis',
+        filename: {
+          js: 'index.js'
+        }
+      }
     }
   ],
   define: {
@@ -43,60 +65,5 @@ export default defineConfig({
       plugins: []
     }
   },
-  plugins: [
-    {
-      name: 'afterBuildScripts',
-      setup(api) {
-        api.onAfterBuild(async () => {
-          // 开发模式下跳过 UMD 兼容性处理
-          const isDev =
-            process.env.NODE_ENV === 'development' ||
-            process.argv.includes('--watch')
-          if (isDev) {
-            return
-          }
-
-          await makeUmdNodeCompatible()
-          await copyToBrowserDirectory()
-        })
-      }
-    }
-  ]
+  plugins: []
 })
-
-/**
- * 使 UMD 文件兼容 Node.js 环境
- */
-async function makeUmdNodeCompatible() {
-  const fs = await import('node:fs')
-  const umdPath = './dist/index.js'
-
-  let content = fs.readFileSync(umdPath, 'utf8')
-
-  // 全局变量兜底逻辑
-  const globalFallback = [
-    'typeof window!=="undefined"?window',
-    'typeof self!=="undefined"?self',
-    'typeof globalThis!=="undefined"?globalThis',
-    'typeof global!=="undefined"?global',
-    'this'
-  ].join(':')
-
-  // 替换 UMD 包装器中的 self
-  const pattern = /([)}\s]*\(\s*)self(\s*,)/g
-  content = content.replace(pattern, `$1${globalFallback}$2`)
-
-  fs.writeFileSync(umdPath, content)
-  console.log('✅ Modified UMD to be Node.js compatible')
-}
-
-/**
- * 复制 UMD 文件到 browser 目录
- */
-async function copyToBrowserDirectory() {
-  mkdirSync('./browser', { recursive: true })
-  copyFileSync('./dist/index.js', './browser/index.js')
-  console.log(
-    '✅ Copied dist/index.js to browser/index.js for backward compatibility'
-  )
-}
