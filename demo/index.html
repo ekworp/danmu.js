@@ -43,14 +43,6 @@
 
       #danmu > div {
         pointer-events: auto;
-        color: #000 !important;
-        -webkit-text-stroke: 0.75px rgb(255 255 255 / 75%);
-        paint-order: stroke fill;
-        text-shadow:
-          -1px -1px 0 rgb(255 255 255 / 75%),
-          1px -1px 0 rgb(255 255 255 / 75%),
-          -1px 1px 0 rgb(255 255 255 / 75%),
-          1px 1px 0 rgb(255 255 255 / 75%);
       }
 
       .controls {
@@ -201,11 +193,9 @@
         needResizeObserver: true,
         channelSize: 20,
         responsiveFontSize: true,
-        defaultOff: true,
         maxVisibleBullets: 20,
         mouseControl: true,
         mouseControlPause: true,
-        dropStaleComments: true,
         area: {
           start: 0.02,
           end: 0.98

@@ -7,7 +7,7 @@
 1. 安装
 
    ```
-   $ npm install danmu.js
+   $ npm install @ekworp/danmu.js
    ```
 
 2. 使用
@@ -24,7 +24,7 @@
 - Step 2:
 
   ```js
-  import DanmuJs from 'danmu.js'
+   import DanmuJs from '@ekworp/danmu.js'
 
   let danmujs = new DanmuJs({
     container: document.getElementById('vs'), //弹幕容器，该容器发生尺寸变化时会自动调整弹幕行为
@@ -92,7 +92,7 @@
 import DanmuJs, {
   type CommentData,
   type DanmuConfigOptions
-} from 'danmu.js'
+ } from '@ekworp/danmu.js'
 ```
 
 播放器可以传入原生 `HTMLMediaElement`，也可以传入兼容播放器适配器：
@@ -108,7 +108,7 @@ const player = {
 
 播放器发生 `seeking`、`seeked` 或 `ratechange` 时，弹幕会自动同步。
 
-浏览器项目建议优先使用普通 ESM 入口，由应用自己的构建工具处理依赖；需要直接通过浏览器加载时可使用 `danmu.js/browser`。项目不再发布 UMD/ES5 全局脚本版本。
+浏览器项目建议优先使用普通 ESM 入口，由应用自己的构建工具处理依赖；需要直接通过浏览器加载时可使用 `@ekworp/danmu.js/browser`。项目不再发布 UMD/ES5 全局脚本版本。
 
 ### Properties
 
