@@ -1,7 +1,9 @@
 import DefaultTheme from 'vitepress/theme'
-import Playground from './Playground.vue'
 import VideoJsDemo from './VideoJsDemo.vue'
+import { defineAsyncComponent } from 'vue'
 import './custom.css'
+
+const Playground = defineAsyncComponent(() => import('./Playground.vue'))
 
 export default {
   extends: DefaultTheme,

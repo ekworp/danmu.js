@@ -6,7 +6,7 @@ const navEn = [
   { text: 'API', link: '/api/methods' },
   { text: 'Playground', link: '/#playground' },
   { text: 'Changelog', link: '/changelog' },
-  { text: 'v1.3.0', items: [{ text: 'GitHub', link: 'https://github.com/ekworp/danmu.js' }] }
+  { text: 'v1.4.0', items: [{ text: 'GitHub', link: 'https://github.com/ekworp/danmu.js' }] }
 ]
 
 const sidebarEn = {
@@ -43,7 +43,7 @@ const navZh = [
   { text: 'API', link: '/zh/api/methods' },
   { text: 'Playground', link: '/zh/#playground' },
   { text: '更新日志', link: '/zh/changelog' },
-  { text: 'v1.3.0', items: [{ text: 'GitHub', link: 'https://github.com/ekworp/danmu.js' }] }
+  { text: 'v1.4.0', items: [{ text: 'GitHub', link: 'https://github.com/ekworp/danmu.js' }] }
 ]
 
 const sidebarZh = {
