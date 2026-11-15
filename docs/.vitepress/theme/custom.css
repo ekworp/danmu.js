@@ -49,11 +49,16 @@
 .videojs-demo { margin: 30px 0 42px; border: 1px solid var(--vp-c-divider); border-radius: 12px; overflow: hidden; background: var(--vp-c-bg-soft); box-shadow: 0 20px 50px rgba(27, 62, 63, .1); }
 .videojs-player-shell { position: relative; background: #10242b; }
 .videojs-player-shell .video-js { width: 100%; min-height: 420px; }
-.videojs-danmu-layer { position: absolute; inset: 0; z-index: 2; pointer-events: auto; }
-.videojs-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 17px; border-top: 1px solid var(--vp-c-divider); }
-.videojs-toolbar button { margin-left: 8px; padding: 8px 13px; border: 1px solid var(--vp-c-divider); border-radius: 6px; background: var(--vp-c-bg); color: var(--vp-c-text-1); font-size: 12px; cursor: pointer; }
-.videojs-toolbar button:hover { border-color: var(--vp-c-brand-1); color: var(--vp-c-brand-1); }
+.videojs-danmu-layer { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.videojs-danmu-layer > * { pointer-events: auto; }
+.videojs-controls { padding: 14px 17px; border-top: 1px solid var(--vp-c-divider); }
+.videojs-control-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 9px; }
+.videojs-control-row:last-of-type { margin-bottom: 0; }
+.videojs-control-row button { padding: 8px 13px; border: 1px solid var(--vp-c-divider); border-radius: 6px; background: var(--vp-c-bg); color: var(--vp-c-text-1); font-size: 12px; cursor: pointer; }
+.videojs-control-row button:hover { border-color: var(--vp-c-brand-1); color: var(--vp-c-brand-1); }
+.videojs-control-row input, .videojs-control-row select { width: 80px; padding: 7px; border: 1px solid var(--vp-c-divider); border-radius: 6px; background: var(--vp-c-bg); color: var(--vp-c-text-1); font-size: 12px; }
+.videojs-control-row label { color: var(--vp-c-text-2); font-size: 12px; }
 .videojs-status { color: var(--vp-c-text-2); font-size: 12px; }
 .videojs-status i { display: inline-block; width: 7px; height: 7px; margin-right: 7px; border-radius: 50%; background: #ff9466; }
 .videojs-status i.ready { background: var(--vp-c-brand-1); }
-@media (max-width: 600px) { .videojs-player-shell .video-js { min-height: 260px; } .videojs-toolbar { align-items: flex-start; flex-direction: column; } .videojs-toolbar button:first-child { margin-left: 0; } }
+@media (max-width: 600px) { .videojs-player-shell .video-js { min-height: 260px; } .videojs-control-row { align-items: stretch; } .videojs-control-row button { flex: 1; } }
