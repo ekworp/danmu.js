@@ -29,6 +29,9 @@
     "build": "tsdown && pnpm run build:types",
     "build:types": "tsc -p tsconfig.build.json",
     "serve": "serve ./",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
     "format": "biome format --write",
     "format:check": "biome format",
     "lint": "biome lint",
@@ -59,6 +62,7 @@
     "serve": "^14.2.7",
     "tsdown": "^0.23.7",
     "typescript": "^7.0.2",
+    "vitepress": "^1.6.4",
     "vitest": "^5.1.0"
   },
   "repository": {

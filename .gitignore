@@ -83,3 +83,7 @@ typings/
 browser/
 
 dist/
+
+# VitePress generated cache and output
+docs/.vitepress/cache/
+docs/.vitepress/dist/
