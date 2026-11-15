@@ -19,4 +19,13 @@ describe('utility functions', () => {
       comments: [{ id: 'a' }]
     })
   })
+
+  it('replaces scalar defaults with object options', () => {
+    const target = { responsiveFontSize: true }
+    deepCopy(target, { responsiveFontSize: { min: 12, max: 24 } })
+
+    expect(target).toEqual({
+      responsiveFontSize: { min: 12, max: 24 }
+    })
+  })
 })

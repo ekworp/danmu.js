@@ -128,7 +128,7 @@ export class DanmuJs extends BaseClass {
     this.freezeId = null
 
     config.comments.forEach((comment: CommentData) => {
-      comment.duration = comment.duration ? comment.duration : 5000
+      comment.duration = comment.duration ? comment.duration : 9000
       if (!comment.mode) {
         comment.mode = 'scroll'
       }
@@ -240,13 +240,12 @@ export class DanmuJs extends BaseClass {
 
   _resizeResponsiveFontSize() {
     const { responsiveFontSize } = this.config
-    if (!responsiveFontSize || !this._responsiveFontSizeBase) return
+    if (!responsiveFontSize) return
 
     const currentSize = this._getResponsiveSize()
     if (!currentSize) return
     if (!this._responsiveFontSizeBase) {
       this._responsiveFontSizeBase = currentSize
-      return
     }
 
     const options =
@@ -409,7 +408,7 @@ export class DanmuJs extends BaseClass {
 
     // Set a default bullet show time
     if (!comment.duration) {
-      comment.duration = 15000
+      comment.duration = 9000
     }
 
     if (
@@ -418,7 +417,7 @@ export class DanmuJs extends BaseClass {
       comment.duration &&
       (comment.el || comment.elLazyInit || comment.txt)
     ) {
-      comment.duration = comment.duration ? comment.duration : 5000
+      comment.duration = comment.duration ? comment.duration : 9000
       if (!comment.style) {
         comment.style = {
           opacity: undefined,
@@ -435,14 +434,15 @@ export class DanmuJs extends BaseClass {
       }
       if (comment.prior || comment.realTime) {
         main.insertComment(comment, true)
-        if (comment.realTime) {
-          main.readData()
-          main.dataHandle()
-        }
       } else {
         main.insertComment(comment)
       }
 
+      this._resizeResponsiveFontSize()
+      if (comment.realTime) {
+        main.readData()
+        main.dataHandle()
+      }
       main.keepPoolWatermark()
       if (!comment.realTime) {
         main.requestTick()
@@ -480,7 +480,7 @@ export class DanmuJs extends BaseClass {
       this.logger.info(`setCommentDuration: id ${id} duration ${duration}`)
 
     if (id && duration) {
-      duration = duration ? duration : 5000
+      duration = duration ? duration : 9000
       this.main.data.some((data: CommentData) => {
         if (data.id === id) {
           data.duration = duration
@@ -631,6 +631,7 @@ export class DanmuJs extends BaseClass {
     }
     main.data = main.data.concat(comments)
     main.sortData()
+    this._resizeResponsiveFontSize()
     main.keepPoolWatermark()
   }
 
@@ -644,7 +645,7 @@ export class DanmuJs extends BaseClass {
         `setAllDuration: mode ${mode} duration ${duration} force ${force}`
       )
     if (duration) {
-      duration = duration ? duration : 5000
+      duration = duration ? duration : 9000
       if (force) {
         this.main.forceDuration = duration
       }

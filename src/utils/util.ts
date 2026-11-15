@@ -95,7 +95,7 @@ export function deepCopy(dst: object, src: object): void {
       const isDomNode =
         typeof Node !== 'undefined' && source[key] instanceof Node
       if (typeOf(source[key]) === 'Object' && !isDomNode) {
-        if (!target[key]) {
+        if (typeOf(target[key]) !== 'Object') {
           target[key] = source[key]
         } else {
           deepCopy(target[key] as object, source[key] as object)
