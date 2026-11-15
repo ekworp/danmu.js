@@ -27,7 +27,9 @@ export default defineConfig({
             { text: '快速开始', link: '/guide/quick-start' },
             { text: '播放器接入', link: '/guide/player' },
             { text: '响应式布局', link: '/guide/responsive' },
-            { text: 'Video.js Demo', link: '/guide/videojs' }
+            { text: 'Video.js Demo', link: '/guide/videojs' },
+            { text: 'React 接入', link: '/guide/react' },
+            { text: '性能调优', link: '/guide/performance' }
           ]
         }
       ],

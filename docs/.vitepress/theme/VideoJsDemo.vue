@@ -12,10 +12,13 @@ const areaEnd = ref(0.98)
 const hideType = ref('scroll')
 const ready = ref(false)
 const status = ref('正在加载 Video.js…')
+const currentTime = ref(0)
+const bulletCount = ref(0)
 let player: any
 let danmu: any
 let nextId = 1
 let danmuStarted = false
+let monitor: number | undefined
 
 const videoSource =
   'https://s1.pstatp.com/cdn/expire-1-M/byted-player-videos/1.0.0/xgplayer-demo.mp4'
@@ -68,7 +71,13 @@ function createComments() {
 
 function updateStatus(message: string) {
   const currentTime = player?.currentTime?.() ?? 0
-  status.value = `${message} · ${currentTime.toFixed(1)}s`
+  status.value = message
+  updateMonitor(currentTime)
+}
+
+function updateMonitor(time = player?.currentTime?.() ?? 0) {
+  currentTime.value = time
+  bulletCount.value = danmu?.state?.bullets?.length ?? 0
 }
 
 function startDanmu() {
@@ -225,6 +234,7 @@ onMounted(async () => {
         danmu.freezeComment(bullet.id)
         window.setTimeout(() => danmu.restartComment(bullet.id), 4000)
       })
+      monitor = window.setInterval(() => updateMonitor(), 250)
     }
   } catch {
     status.value = 'Video.js 或 danmu.js 加载失败，请检查网络连接'
@@ -232,6 +242,7 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
+  if (monitor) window.clearInterval(monitor)
   danmu?.destroy()
   player?.dispose()
 })
@@ -281,7 +292,11 @@ onUnmounted(() => {
         <button @click="hideDanmu">隐藏</button>
         <button @click="showDanmu">显示</button>
       </div>
-      <div class="videojs-status"><i :class="{ ready }" />{{ status }}</div>
+      <div class="videojs-status">
+        <i :class="{ ready }" />
+        <span>{{ status }}</span>
+        <span class="videojs-metrics">时间 {{ currentTime.toFixed(1) }}s · 当前弹幕 {{ bulletCount }}</span>
+      </div>
     </div>
   </div>
 </template>

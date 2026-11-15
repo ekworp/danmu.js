@@ -59,6 +59,7 @@
 .videojs-control-row input, .videojs-control-row select { width: 80px; padding: 7px; border: 1px solid var(--vp-c-divider); border-radius: 6px; background: var(--vp-c-bg); color: var(--vp-c-text-1); font-size: 12px; }
 .videojs-control-row label { color: var(--vp-c-text-2); font-size: 12px; }
 .videojs-status { color: var(--vp-c-text-2); font-size: 12px; }
+.videojs-metrics { margin-left: 12px; color: var(--vp-c-text-3); font-variant-numeric: tabular-nums; }
 .videojs-status i { display: inline-block; width: 7px; height: 7px; margin-right: 7px; border-radius: 50%; background: #ff9466; }
 .videojs-status i.ready { background: var(--vp-c-brand-1); }
-@media (max-width: 600px) { .videojs-player-shell .video-js { min-height: 260px; } .videojs-control-row { align-items: stretch; } .videojs-control-row button { flex: 1; } }
+@media (max-width: 600px) { .videojs-player-shell .video-js { min-height: 220px; } .videojs-control-row { align-items: stretch; } .videojs-control-row button { flex: 1 1 calc(50% - 8px); min-height: 38px; } .videojs-control-row input, .videojs-control-row select { flex: 1; min-height: 38px; } .videojs-metrics { display: block; margin: 5px 0 0 14px; } }

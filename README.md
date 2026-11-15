@@ -85,7 +85,7 @@
    })
   ```
 
-这是 danmu.js 的 npm 使用方法，示例可以参考 [DEMO](https://github.com/ekworp/danmu.js/tree/main/demo/index.html)。
+这是 danmu.js 的 npm 使用方法，示例可以参考 [在线文档与 Video.js Demo](https://ekworp.github.io/danmu.js/guide/videojs)。
 
 当前 npm 包提供 ESM、CommonJS 和自包含现代浏览器 ESM 三种入口，并附带完整 TypeScript 声明：
 
@@ -205,7 +205,7 @@ $ pnpm run build:types
 $ pnpm serve
 ```
 
-访问 [http://localhost:3000/demo/index.html](http://localhost:3000/demo/index.html)
+访问 [http://localhost:5173](http://localhost:5173)，或运行 `pnpm run docs:dev` 查看文档站。
 
 ### License
 
