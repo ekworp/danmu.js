@@ -1,8 +1,8 @@
-# 播放器接入
+# Player integration
 
-## 原生媒体元素
+## Native media elements
 
-传入 `HTMLMediaElement` 后，danmu.js 会同步 `playing`、`pause`、`seeking`、`seeked`、`timeupdate` 和 `ratechange` 事件。
+Pass an `HTMLMediaElement` to synchronize `playing`, `pause`, `seeking`, `seeked`, `timeupdate`, and `ratechange` events.
 
 ```ts
 const video = document.querySelector<HTMLVideoElement>('#video')!
@@ -14,9 +14,9 @@ const danmu = new DanmuJs({
 })
 ```
 
-## 自定义播放器适配器
+## Custom player adapters
 
-播放器只需要提供当前时间和事件监听能力：
+An adapter only needs the current time and event methods:
 
 ```ts
 const player = {
@@ -29,7 +29,7 @@ const player = {
 const danmu = new DanmuJs({ container, player, comments })
 ```
 
-需要跟随播放器倍速时，开启：
+Enable playback-rate synchronization when needed:
 
 ```ts
 syncPlaybackRate: true

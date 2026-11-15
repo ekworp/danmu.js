@@ -1,4 +1,4 @@
-# 弹幕数据
+# Comment data
 
 ```ts
 interface CommentData {
@@ -15,13 +15,13 @@ interface CommentData {
 }
 ```
 
-## 显示模式
+## Display modes
 
-- `scroll`：横向滚动弹幕
-- `top`：顶部居中弹幕
-- `bottom`：底部居中弹幕
+- `scroll`: horizontal scrolling comment
+- `top`: centered top comment
+- `bottom`: centered bottom comment
 
-## 自定义样式
+## Custom styles
 
 ```ts
 {
@@ -29,7 +29,7 @@ interface CommentData {
   start: 1000,
   duration: 9000,
   mode: 'scroll',
-  txt: '彩色弹幕',
+  txt: 'A styled comment',
   style: {
     color: '#ff9500',
     fontSize: '20px',

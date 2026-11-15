@@ -1,21 +1,21 @@
-# 快速开始
+# Quick start
 
-## 安装
+## Install
 
 ```bash
 pnpm add @ekworp/danmu.js
-# 或 npm install @ekworp/danmu.js
+# or npm install @ekworp/danmu.js
 ```
 
-## 创建容器
+## Create a container
 
-弹幕容器需要有明确的尺寸：
+The danmaku container needs an explicit size:
 
 ```html
 <div id="danmu" style="position: relative; height: 300px"></div>
 ```
 
-## 初始化
+## Initialize
 
 ```ts
 import DanmuJs from '@ekworp/danmu.js'
@@ -29,7 +29,7 @@ const danmu = new DanmuJs({
       id: 'welcome',
       start: 0,
       duration: 9000,
-      txt: '欢迎使用 danmu.js',
+      txt: 'Welcome to danmu.js',
       mode: 'scroll'
     }
   ]
@@ -38,9 +38,9 @@ const danmu = new DanmuJs({
 danmu.start()
 ```
 
-默认情况下，`defaultOff` 为 `true`，需要主动调用 `start()`。如果传入原生 `video` 或 `audio`，弹幕会跟随播放器同步。
+`defaultOff` is `true` by default, so call `start()` explicitly. When a native `video` or `audio` element is provided, danmu.js follows the media timeline.
 
-## 实时发送
+## Send live comments
 
 ```ts
 danmu.sendComment({
@@ -48,9 +48,9 @@ danmu.sendComment({
   start: 0,
   duration: 9000,
   realTime: true,
-  txt: '这是一条实时弹幕',
+  txt: 'A live comment',
   mode: 'scroll'
 })
 ```
 
-继续阅读：[播放器接入](/guide/player)、[响应式布局](/guide/responsive)。
+Continue with [player integration](/guide/player) or [responsive layout](/guide/responsive).

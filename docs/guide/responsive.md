@@ -1,6 +1,6 @@
-# 响应式布局
+# Responsive layout
 
-默认开启 `needResizeObserver` 和 `responsiveFontSize`：
+`needResizeObserver` and `responsiveFontSize` are enabled by default:
 
 ```ts
 const danmu = new DanmuJs({
@@ -13,16 +13,16 @@ const danmu = new DanmuJs({
 })
 ```
 
-字体会根据容器主方向尺寸缩放：
+Font size follows the container's primary axis:
 
-- `r2l` / `l2r` 使用容器宽度
-- `b2t` / `t2b` 使用容器高度
+- `r2l` / `l2r` use the container width.
+- `b2t` / `t2b` use the container height.
 
-如果容器初始化时处于 `display: none`，首次显示后调用 `resize()` 即可重新建立响应式基准：
+If the container starts with `display: none`, call `resize()` after showing it:
 
 ```ts
 container.style.display = 'block'
 danmu.resize()
 ```
 
-不需要额外监听 fullscreen 事件。`ResizeObserver` 会处理普通尺寸变化和全屏尺寸变化。
+No fullscreen-specific listener is required. `ResizeObserver` handles regular and fullscreen size changes.

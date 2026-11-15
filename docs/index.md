@@ -1,46 +1,46 @@
 ---
 layout: home
 title: danmu.js
-titleTemplate: HTML5 弹幕引擎
-description: 面向现代浏览器的高性能 HTML5 弹幕引擎
+titleTemplate: HTML5 Danmaku Engine
+description: A modern, high-performance HTML5 danmaku engine
 hero:
   name: danmu.js
-  text: 让每个 DOM 元素都能承载弹幕
-  tagline: 面向现代浏览器的高性能弹幕引擎，支持响应式布局、原生媒体同步、TypeScript 和多种模块格式。
+  text: Put danmaku on any DOM element
+  tagline: A modern danmaku engine with responsive layout, media synchronization, TypeScript support, and multiple module formats.
   actions:
     - theme: brand
-      text: 打开 Playground
+      text: Open Playground
       link: '#playground'
     - theme: alt
-      text: 快速开始
+      text: Quick start
       link: /guide/quick-start
   image:
-    src: /danmu.js/hero.svg
+    src: /hero.svg
     alt: danmu.js
 features:
   - icon: ⚡
-    title: 轻量高效
-    details: 自适应调度和 DOM 回收，适合高密度弹幕场景。
+    title: Fast and lightweight
+    details: Adaptive scheduling and DOM recycling for dense danmaku streams.
   - icon: ◌
-    title: 响应式布局
-    details: 自动适配普通容器、隐藏容器和全屏尺寸变化。
+    title: Responsive layout
+    details: Handles regular containers, hidden containers, and fullscreen resizing.
   - icon: ◇
-    title: TypeScript
-    details: 提供完整类型声明，支持 ESM、CJS 和浏览器 ESM。
+    title: TypeScript ready
+    details: Complete type declarations with ESM, CJS, and browser ESM builds.
 ---
 
 <div id="playground" class="playground-section">
   <div class="section-intro">
     <div>
       <p class="eyebrow">LIVE PLAYGROUND</p>
-      <h2>马上试一下</h2>
+      <h2>Try it now</h2>
     </div>
-    <p>调整参数，观察弹幕在不同方向和尺寸下的表现。</p>
+    <p>Adjust the configuration and see danmaku move in real time.</p>
   </div>
   <Playground />
 </div>
 
-## 快速开始
+## Quick start
 
 ```bash
 pnpm add @ekworp/danmu.js
@@ -67,6 +67,6 @@ danmu.start()
 ```
 
 <div class="home-links">
-  <a href="/danmu.js/guide/quick-start">阅读快速开始 →</a>
-  <a href="/danmu.js/api/options">浏览配置参考 →</a>
+  <a href="/danmu.js/guide/quick-start">Read the quick start →</a>
+  <a href="/danmu.js/api/options">Browse configuration →</a>
 </div>

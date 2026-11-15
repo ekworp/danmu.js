@@ -32,7 +32,7 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Check formatting and lint
         run: pnpm run check
@@ -48,9 +48,6 @@ jobs:
 
       - name: Build package
         run: pnpm run build
-
-      - name: Build documentation
-        run: pnpm run docs:build
 
       - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium

@@ -1,10 +1,10 @@
 # Video.js Demo
 
-这个示例演示 danmu.js 如何覆盖在 Video.js 播放器内部，并与原生视频时间同步。
+This example places danmu.js inside a Video.js player and synchronizes comments with the native video timeline.
 
 <VideoJsDemo />
 
-## 核心代码
+## Core integration
 
 ```ts
 import DanmuJs from '@ekworp/danmu.js'
@@ -31,25 +31,10 @@ const danmu = new DanmuJs({
 })
 ```
 
-## 关键点
+## Important details
 
-1. 将弹幕容器放入 `player.el()`，这样进入 Video.js 全屏时弹幕层也会保持在播放器内部。
-2. 将原生 `HTMLVideoElement` 传给 `player`，danmu.js 会自动同步媒体事件。
-3. 实时弹幕的 `start` 使用播放器当前时间乘以 `1000` 转换为毫秒。
+1. Put the danmaku container inside `player.el()` so it stays inside the player in fullscreen mode.
+2. Pass the native `HTMLVideoElement` to `player` so danmu.js can synchronize media events.
+3. Convert the player's current time to milliseconds when sending live comments.
 
-当前文档 Demo 使用 CDN 加载 Video.js，生产项目也可以通过 npm 安装：
-
-```bash
-pnpm add video.js @ekworp/danmu.js
-```
-
-## Demo 组件源码
-
-下面是页面当前使用的 Vue 组件源码，文档构建时会直接读取组件文件，避免示例代码与实际 Demo 不一致。
-
-<details>
-<summary>展开 VideoJsDemo.vue</summary>
-
-<<< @/.vitepress/theme/VideoJsDemo.vue{vue}
-
-</details>
+See the [full demo component source](/guide/videojs#demo-component-source).

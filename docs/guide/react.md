@@ -1,11 +1,10 @@
-# React 接入
+# React integration
 
-danmu.js 不依赖框架，可以在 React `useEffect` 中初始化，并在组件卸载时销毁。
+danmu.js is framework agnostic. Initialize it in `useEffect` and destroy it when the component unmounts.
 
 ```tsx
 import { useEffect, useRef } from 'react'
-import DanmuJs from '@ekworp/danmu.js'
-import type { CommentData } from '@ekworp/danmu.js'
+import DanmuJs, { type CommentData } from '@ekworp/danmu.js'
 
 export function DanmuLayer({ comments }: { comments: CommentData[] }) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -28,9 +27,9 @@ export function DanmuLayer({ comments }: { comments: CommentData[] }) {
 }
 ```
 
-## 注意事项
+## Notes
 
-- 容器必须有明确高度，建议使用 `position: relative`。
-- 不要在每次渲染时重复创建实例。
-- `comments` 频繁变化时，可以使用 `updateComments()`，避免销毁并重建。
-- 如果容器处于 `display: none`，显示后调用 `danmu.resize()`。
+- Give the container an explicit height.
+- Do not create a new instance on every render.
+- Use `updateComments()` for frequent data changes.
+- Call `danmu.resize()` after showing a previously hidden container.

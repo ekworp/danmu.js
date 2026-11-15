@@ -49,7 +49,7 @@ jobs:
           NODE
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Check formatting and lint
         run: pnpm run check

@@ -53,13 +53,7 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Check source
-        run: |
-          pnpm run check
-          pnpm run typecheck
-          pnpm run test
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Build documentation
         run: pnpm run docs:build
