@@ -29,6 +29,7 @@ const sidebarEn = {
       items: [
         { text: 'Configuration', link: '/api/options' },
         { text: 'Comment data', link: '/api/comments' },
+        { text: 'Type definitions', link: '/api/generated' },
         { text: 'Instance methods', link: '/api/methods' },
         { text: 'Events', link: '/api/events' }
       ]
@@ -65,6 +66,7 @@ const sidebarZh = {
       items: [
         { text: '配置项', link: '/zh/api/options' },
         { text: '弹幕数据', link: '/zh/api/comments' },
+        { text: '类型定义', link: '/zh/api/generated' },
         { text: '实例方法', link: '/zh/api/methods' },
         { text: '事件', link: '/zh/api/events' }
       ]
@@ -77,6 +79,22 @@ export default defineConfig({
   description: 'Modern HTML5 danmaku engine',
   base: '/danmu.js/',
   cleanUrls: true,
+  sitemap: {
+    hostname: 'https://ekworp.github.io/danmu.js/'
+  },
+  head: [
+    ['meta', { name: 'theme-color', content: '#2f9c68' }],
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:title', content: 'danmu.js · HTML5 Danmaku Engine' }],
+    [
+      'meta',
+      {
+        property: 'og:description',
+        content: 'A modern, high-performance HTML5 danmaku engine.'
+      }
+    ],
+    ['meta', { property: 'og:image', content: 'https://ekworp.github.io/danmu.js/hero.svg' }]
+  ],
   locales: {
     root: { label: 'English', lang: 'en' },
     zh: {
@@ -93,6 +111,12 @@ export default defineConfig({
     siteTitle: '› danmu.js',
     nav: navEn,
     sidebar: sidebarEn,
+    lastUpdated: true,
+    lastUpdatedText: 'Last updated',
+    editLink: {
+      pattern: 'https://github.com/ekworp/danmu.js/edit/main/docs/:path',
+      text: 'Edit this page on GitHub'
+    },
     socialLinks: [
       { icon: 'github', link: 'https://github.com/ekworp/danmu.js' },
       { icon: 'npm', link: 'https://www.npmjs.com/package/@ekworp/danmu.js' }
