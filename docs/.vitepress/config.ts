@@ -1,126 +1,98 @@
 import { defineConfig } from 'vitepress'
 
+const navEn = [
+  { text: 'Guide', link: '/guide/quick-start' },
+  { text: 'Config', link: '/api/options' },
+  { text: 'API', link: '/api/methods' },
+  { text: 'Playground', link: '/#playground' },
+  { text: 'Changelog', link: '/changelog' },
+  { text: 'v1.3.0', items: [{ text: 'GitHub', link: 'https://github.com/ekworp/danmu.js' }] }
+]
+
+const sidebarEn = {
+  '/guide/': [
+    {
+      text: 'Guide',
+      items: [
+        { text: 'Quick start', link: '/guide/quick-start' },
+        { text: 'Player integration', link: '/guide/player' },
+        { text: 'Responsive layout', link: '/guide/responsive' },
+        { text: 'Video.js Demo', link: '/guide/videojs' },
+        { text: 'React integration', link: '/guide/react' },
+        { text: 'Performance', link: '/guide/performance' }
+      ]
+    }
+  ],
+  '/api/': [
+    {
+      text: 'Reference',
+      items: [
+        { text: 'Configuration', link: '/api/options' },
+        { text: 'Comment data', link: '/api/comments' },
+        { text: 'Instance methods', link: '/api/methods' },
+        { text: 'Events', link: '/api/events' }
+      ]
+    }
+  ]
+}
+
+const navZh = [
+  { text: '指南', link: '/zh/guide/quick-start' },
+  { text: '配置', link: '/zh/api/options' },
+  { text: 'API', link: '/zh/api/methods' },
+  { text: 'Playground', link: '/zh/#playground' },
+  { text: '更新日志', link: '/zh/changelog' },
+  { text: 'v1.3.0', items: [{ text: 'GitHub', link: 'https://github.com/ekworp/danmu.js' }] }
+]
+
+const sidebarZh = {
+  '/zh/guide/': [
+    {
+      text: '开始使用',
+      items: [
+        { text: '快速开始', link: '/zh/guide/quick-start' },
+        { text: '播放器接入', link: '/zh/guide/player' },
+        { text: '响应式布局', link: '/zh/guide/responsive' },
+        { text: 'Video.js Demo', link: '/zh/guide/videojs' },
+        { text: 'React 接入', link: '/zh/guide/react' },
+        { text: '性能调优', link: '/zh/guide/performance' }
+      ]
+    }
+  ],
+  '/zh/api/': [
+    {
+      text: '参考',
+      items: [
+        { text: '配置项', link: '/zh/api/options' },
+        { text: '弹幕数据', link: '/zh/api/comments' },
+        { text: '实例方法', link: '/zh/api/methods' },
+        { text: '事件', link: '/zh/api/events' }
+      ]
+    }
+  ]
+}
+
 export default defineConfig({
   title: 'danmu.js',
-  description: '现代化 HTML5 弹幕引擎',
+  description: 'Modern HTML5 danmaku engine',
   base: '/danmu.js/',
   cleanUrls: true,
   locales: {
     root: { label: 'English', lang: 'en' },
-    zh: { label: '简体中文', lang: 'zh-CN', link: '/zh/' }
+    zh: {
+      label: '简体中文',
+      lang: 'zh-CN',
+      link: '/zh/',
+      themeConfig: {
+        nav: navZh,
+        sidebar: sidebarZh
+      }
+    }
   },
   themeConfig: {
     siteTitle: '› danmu.js',
-    nav: [
-      { text: 'Guide', link: '/guide/quick-start' },
-      { text: 'Config', link: '/api/options' },
-      { text: 'API', link: '/api/methods' },
-      { text: 'Playground', link: '/#playground' },
-      { text: 'Changelog', link: '/changelog' },
-      { text: 'v1.3.0', items: [{ text: 'GitHub', link: 'https://github.com/ekworp/danmu.js' }] }
-    ],
-    sidebar: {
-      '/guide/': [
-        {
-          text: 'Guide',
-          items: [
-            { text: 'Quick start', link: '/guide/quick-start' },
-            { text: 'Player integration', link: '/guide/player' },
-            { text: 'Responsive layout', link: '/guide/responsive' },
-            { text: 'Video.js Demo', link: '/guide/videojs' },
-            { text: 'React integration', link: '/guide/react' },
-            { text: 'Performance', link: '/guide/performance' }
-          ]
-        }
-      ],
-      '/api/': [
-        {
-          text: 'Reference',
-          items: [
-            { text: 'Configuration', link: '/api/options' },
-            { text: 'Comment data', link: '/api/comments' },
-            { text: 'Instance methods', link: '/api/methods' },
-            { text: 'Events', link: '/api/events' }
-          ]
-        }
-      ]
-    },
-    locales: {
-      root: {
-        label: 'English',
-        nav: [
-          { text: 'Guide', link: '/guide/quick-start' },
-          { text: 'Config', link: '/api/options' },
-          { text: 'API', link: '/api/methods' },
-          { text: 'Playground', link: '/#playground' },
-          { text: 'Changelog', link: '/changelog' },
-          { text: 'v1.3.0', items: [{ text: 'GitHub', link: 'https://github.com/ekworp/danmu.js' }] }
-        ],
-        sidebar: {
-          '/guide/': [
-            {
-              text: 'Guide',
-              items: [
-                { text: 'Quick start', link: '/guide/quick-start' },
-                { text: 'Player integration', link: '/guide/player' },
-                { text: 'Responsive layout', link: '/guide/responsive' },
-                { text: 'Video.js Demo', link: '/guide/videojs' },
-                { text: 'React integration', link: '/guide/react' },
-                { text: 'Performance', link: '/guide/performance' }
-              ]
-            }
-          ],
-          '/api/': [
-            {
-              text: 'Reference',
-              items: [
-                { text: 'Configuration', link: '/api/options' },
-                { text: 'Comment data', link: '/api/comments' },
-                { text: 'Instance methods', link: '/api/methods' },
-                { text: 'Events', link: '/api/events' }
-              ]
-            }
-          ]
-        }
-      },
-      zh: {
-        label: '简体中文',
-        nav: [
-          { text: '指南', link: '/zh/guide/quick-start' },
-          { text: '配置', link: '/zh/api/options' },
-          { text: 'API', link: '/zh/api/methods' },
-          { text: 'Playground', link: '/zh/#playground' },
-          { text: '更新日志', link: '/zh/changelog' },
-          { text: 'v1.3.0', items: [{ text: 'GitHub', link: 'https://github.com/ekworp/danmu.js' }] }
-        ],
-        sidebar: {
-          '/zh/guide/': [
-            {
-              text: '开始使用',
-              items: [
-                { text: '快速开始', link: '/zh/guide/quick-start' },
-                { text: '播放器接入', link: '/zh/guide/player' },
-                { text: '响应式布局', link: '/zh/guide/responsive' },
-                { text: 'Video.js Demo', link: '/zh/guide/videojs' },
-                { text: 'React 接入', link: '/zh/guide/react' },
-                { text: '性能调优', link: '/zh/guide/performance' }
-              ]
-            }
-          ],
-          '/zh/api/': [
-            {
-              text: '参考',
-              items: [
-                { text: '配置项', link: '/zh/api/options' },
-                { text: '弹幕数据', link: '/zh/api/comments' },
-                { text: '实例方法', link: '/zh/api/methods' },
-                { text: '事件', link: '/zh/api/events' }
-              ]
-            }
-          ]
-        }
-      }
-    },
+    nav: navEn,
+    sidebar: sidebarEn,
     socialLinks: [
       { icon: 'github', link: 'https://github.com/ekworp/danmu.js' },
       { icon: 'npm', link: 'https://www.npmjs.com/package/@ekworp/danmu.js' }
