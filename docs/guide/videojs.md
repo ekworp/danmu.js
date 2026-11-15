@@ -42,3 +42,14 @@ const danmu = new DanmuJs({
 ```bash
 pnpm add video.js @ekworp/danmu.js
 ```
+
+## Demo 组件源码
+
+下面是页面当前使用的 Vue 组件源码，文档构建时会直接读取组件文件，避免示例代码与实际 Demo 不一致。
+
+<details>
+<summary>展开 VideoJsDemo.vue</summary>
+
+<<< @/.vitepress/theme/VideoJsDemo.vue{vue}
+
+</details>

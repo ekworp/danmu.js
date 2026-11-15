@@ -70,9 +70,8 @@ function createComments() {
 }
 
 function updateStatus(message: string) {
-  const currentTime = player?.currentTime?.() ?? 0
   status.value = message
-  updateMonitor(currentTime)
+  updateMonitor()
 }
 
 function updateMonitor(time = player?.currentTime?.() ?? 0) {
@@ -80,25 +79,10 @@ function updateMonitor(time = player?.currentTime?.() ?? 0) {
   bulletCount.value = danmu?.state?.bullets?.length ?? 0
 }
 
-function startDanmu() {
-  danmu?.start()
-  danmuStarted = true
-  updateStatus('弹幕已开始')
-}
-
-function pauseDanmu() {
-  danmu?.pause()
-  updateStatus('弹幕已暂停')
-}
-
-function playDanmu() {
-  danmu?.play()
-  updateStatus('弹幕已继续')
-}
-
-function stopDanmu() {
-  danmu?.stop()
-  updateStatus('弹幕已停止')
+function control(method: 'start' | 'pause' | 'play' | 'stop', message: string) {
+  danmu?.[method]()
+  if (method === 'start') danmuStarted = true
+  updateStatus(message)
 }
 
 function sendComment(text = commentText.value) {
@@ -209,11 +193,11 @@ onMounted(async () => {
       status.value = '视频加载失败，请检查视频源或网络连接'
     })
     player.on('play', () => {
-      if (!danmuStarted) startDanmu()
-      else playDanmu()
+      if (!danmuStarted) control('start', '弹幕已开始')
+      else control('play', '弹幕已继续')
     })
-    player.on('pause', pauseDanmu)
-    player.on('ended', stopDanmu)
+    player.on('pause', () => control('pause', '弹幕已暂停'))
+    player.on('ended', () => control('stop', '弹幕已停止'))
 
     if (danmuContainer.value) {
       player.el().appendChild(danmuContainer.value)
@@ -259,10 +243,10 @@ onUnmounted(() => {
     </div>
     <div class="videojs-controls">
       <div class="videojs-control-row">
-        <button @click="startDanmu">开始弹幕</button>
-        <button @click="pauseDanmu">暂停弹幕</button>
-        <button @click="playDanmu">继续弹幕</button>
-        <button @click="stopDanmu">停止弹幕</button>
+        <button @click="control('start', '弹幕已开始')">开始弹幕</button>
+        <button @click="control('pause', '弹幕已暂停')">暂停弹幕</button>
+        <button @click="control('play', '弹幕已继续')">继续弹幕</button>
+        <button @click="control('stop', '弹幕已停止')">停止弹幕</button>
         <button @click="sendComment(`实时弹幕 ${nextId}`)">发送实时弹幕</button>
         <button @click="sendBurst">发送 100 条弹幕</button>
       </div>

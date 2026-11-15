@@ -14,6 +14,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   release:
     name: Create release
@@ -22,12 +26,24 @@ jobs:
     steps:
       - name: Resolve tag
         id: tag
+        env:
+          TAG_INPUT: ${{ inputs.tag }}
         shell: bash
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "name=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+            printf 'name=%s\n' "$TAG_INPUT" >> "$GITHUB_OUTPUT"
           else
-            echo "name=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+            printf 'name=%s\n' "$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate tag
+        env:
+          TAG_NAME: ${{ steps.tag.outputs.name }}
+        shell: bash
+        run: |
+          if [[ ! "$TAG_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid release tag: $TAG_NAME"
+            exit 1
           fi
 
       - name: Create GitHub release
