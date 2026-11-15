@@ -180,7 +180,7 @@ onMounted(async () => {
       document.head.appendChild(link)
     }
     await loadScript('https://vjs.zencdn.net/8.23.4/video.min.js')
-    const module = await import('../../../browser/index.mjs')
+    const module = await import('../../../src/index.ts')
     const DanmuJs = module.default
     player = (window as any).videojs(video.value, {
       controls: true,

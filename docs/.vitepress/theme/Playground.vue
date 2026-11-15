@@ -82,7 +82,7 @@ watch(duration, () => {
 })
 
 onMounted(async () => {
-  const module = await import('../../../browser/index.mjs')
+  const module = await import('../../../src/index.ts')
   DanmuJs = module.default
   createDanmu()
 })
